@@ -54,7 +54,6 @@ export const SignUpForm: FC<Props> = ({ switchFormMode }) => {
         <Text fontSize="3xl" fontWeight="bold">
           Sign up
         </Text>
-
         <IconButton
           onClick={switchFormMode}
           aria-label="close sign up form"

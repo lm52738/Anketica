@@ -36,7 +36,10 @@ export const App = () => {
               direction="row"
               justify="space-between"
               align="center"
-              p="6"
+              p={{
+                base: 0,
+                md: "6",
+              }}
             >
               <Hero />
               <Auth />

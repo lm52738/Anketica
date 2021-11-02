@@ -12,17 +12,36 @@ export const Auth = () => {
   return (
     <VStack
       align="start"
-      minW="300px"
+      minW={{
+        base: "100vw",
+        md: "300px",
+      }}
       w="full"
-      maxW="400px"
-      minH="400px"
+      maxW={{
+        base: "100vw",
+        md: "400px",
+      }}
+      minH={{
+        base: "100vh",
+        md: "400px",
+      }}
       h="full"
-      maxH="650px"
-      p="6"
+      maxH={{
+        base: "100vh",
+        md: "650px",
+      }}
       bg="white"
-      boxShadow="lg"
-      borderRadius="lg"
+      boxShadow={{
+        base: "none",
+        md: "lg",
+      }}
+      borderRadius={{
+        base: "none",
+        md: "lg",
+      }}
       mx="auto"
+      p="6"
+      spacing="6"
     >
       {showLogin ? (
         <LoginForm switchFormMode={switchFormMode} />
