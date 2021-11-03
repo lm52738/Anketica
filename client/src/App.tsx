@@ -40,6 +40,8 @@ export const App = () => {
                 base: 0,
                 md: "6",
               }}
+              maxW="1440px"
+              mx="auto"
             >
               <Hero />
               <Auth />
