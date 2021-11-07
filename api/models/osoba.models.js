@@ -1,10 +1,10 @@
 const OsobaClass =
     class Ososba {
-        constructor(id, id_uloga, firstName, lastName, mail, datum_rod, rod, password) {
+        constructor(id, id_uloga, ime, prezime, mail, datum_rod, rod, password) {
             this.id = id;
             this.id_uloga = id_uloga;
-            this.firstName = firstName;
-            this.lastName = lastName;
+            this.ime = ime;
+            this.prezime = prezime;
             this.mail = mail;
             this.datum_rod = datum_rod;
             this.rod = rod;
