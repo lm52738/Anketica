@@ -7,7 +7,7 @@ const db = require ("../db/index.js")
 
 router.post ("/", async (req,res) => {
     console.log ("u postu sam");
-    const id = req.body.id
+    //const id = req.body.id
     const id_uloga = req.body.id_uloga
     const ime = req.body.ime
     const prezime = req.body.prezime
@@ -18,8 +18,10 @@ router.post ("/", async (req,res) => {
     console.log (mail);
     console.log (password);
 
-    const sql = "INSERT INTO osobe (id, id_uloga, ime, prezime, mail, datum_rod, rod, password)" +
-     " VALUES ('" + id + "','" + id_uloga + "','" + ime + "','" + prezime + "','" + mail + "','" + datum_rod + "','" + rod + "','" + password + "')"
+    //const sql = "INSERT INTO osobe (id, id_uloga, ime, prezime, mail, datum_rod, rod, password)" +
+     //" VALUES ('" + id + "','" + id_uloga + "','" + ime + "','" + prezime + "','" + mail + "','" + datum_rod + "','" + rod + "','" + password + "')"
+     const sql = "INSERT INTO osobe (id_uloga, ime, prezime, mail, datum_rod, rod, password)" +
+     " VALUES ('"  + id_uloga + "','" + ime + "','" + prezime + "','" + mail + "','" + datum_rod + "','" + rod + "','" + password + "')"
 
     await db.query (sql, [])
     //.then()
