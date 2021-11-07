@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-
-
 const db = require ("../db/index.js")
+
 //router.use (express.json())
 
 router.post ("/", async (req,res) => {
@@ -27,6 +26,7 @@ router.post ("/", async (req,res) => {
     //.then()
     //(err, res) => {console.log(err))
 })
+
 
 router.get("/", function(req, res, next) {
     res.send("LOGIN PAGE");

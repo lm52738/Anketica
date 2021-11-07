@@ -123,7 +123,19 @@ export const SignUpForm: FC<Props> = ({ switchFormMode }) => {
       gender,
     };
 
+
     console.log(allData);
+
+    fetch('http://localhost:9000/signup', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(allData),
+    })
+    .catch(err => {
+        console.log(err);
+    });
 
     // validation
 
