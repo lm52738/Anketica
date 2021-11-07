@@ -12,8 +12,19 @@ router.post ("/", async (req,res) => {
     const prezime = req.body.lastName
     const mail = req.body.email
     const datum_rod = req.body.birthDay
-    const rod = req.body.gender
+    var rod = req.body.gender
     const password = req.body.password
+
+    switch(rod) {
+        case 'male':
+            rod = 'm'
+          break;
+        case 'female':
+            rod = 'f';
+          break;
+        default:
+          rod = 'o';
+      }
     console.log (ime);
     console.log (prezime);
     console.log (datum_rod);
@@ -21,7 +32,7 @@ router.post ("/", async (req,res) => {
     console.log (mail);
     console.log (password);
 
-    const sql = "INSERT INTO lik (ime, prezime, mail, datum_rod, rod, password)" +
+    const sql = "INSERT INTO osobe ( ime, prezime, mail, datum_rod, rod, password)" +
      " VALUES ('" + ime + "','" + prezime + "','" + mail + "','" + datum_rod + "','" + rod + "','" + password + "')";
 
     await db.query (sql, [])
