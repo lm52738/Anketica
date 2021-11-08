@@ -38,8 +38,26 @@ export const LoginForm: FC<Props> = ({ switchFormMode }) => {
     },
   });
 
-  const login: SubmitHandler<Fields> = async () => {
+  const login: SubmitHandler<LoginFormFields> = async (data) => {
+
+    const allData = {
+      ...data,
+    };
+    console.log(allData);
+
     // TODO: implement
+    fetch('http://localhost:9000/login', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(allData),
+    })
+    .catch(err => {
+        console.log(err);
+    });
+
+
     await new Promise((resolve) => {
       setTimeout(() => {
         resolve(null);

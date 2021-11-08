@@ -33,11 +33,14 @@ router.post ("/", async (req,res) => {
     console.log (password);
 
     const sql = "INSERT INTO osobe ( ime, prezime, mail, datum_rod, rod, password)" +
-     " VALUES ('" + ime + "','" + prezime + "','" + mail + "','" + datum_rod + "','" + rod + "','" + password + "')";
+     " VALUES ('" + ime + "','" + prezime + "','" + mail + "','" + datum_rod + "','" + rod + "','" + password + "') RETURNING id";
 
-    await db.query (sql, [])
-    //.then()
-    //(err, res) => {console.log(err))
+     try {
+      await db.query(sql, []);
+    } catch (err) {
+        console.log(err);
+        throw err
+    }
 })
 
 module.exports = router;
