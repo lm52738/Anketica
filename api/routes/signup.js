@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require ("../db/index.js")
+const Osoba = require('../models/osoba.models')
 
 router.get("/", function(req, res, next) {
     res.send("SIGN UP PAGE");
@@ -13,7 +14,9 @@ router.post ("/", async (req,res) => {
     const mail = req.body.email
     const datum_rod = req.body.birthDay
     var rod = req.body.gender
-    const password = req.body.password
+    const password1 = req.body.password
+    const password2 = req.body.verifyPassword
+
 
     switch(rod) {
         case 'male':
@@ -30,17 +33,23 @@ router.post ("/", async (req,res) => {
     console.log (datum_rod);
     console.log (rod);
     console.log (mail);
-    console.log (password);
+    console.log (password1);
+    console.log (password2);
 
-    const sql = "INSERT INTO osobe ( ime, prezime, mail, datum_rod, rod, password)" +
-     " VALUES ('" + ime + "','" + prezime + "','" + mail + "','" + datum_rod + "','" + rod + "','" + password + "') RETURNING id";
-
-     try {
-      await db.query(sql, []);
-    } catch (err) {
-        console.log(err);
-        throw err
+    //provjeri istovjetnost unesenenih zaporki
+    if (password1 !== password2) {
+      console.log("NISU ISTE LOZINKE")
+      return;
     }
+
+    let osoba = await Osoba.fetchByEmail(mail);
+    if (osoba.id !== undefined){
+      console.log("POSTOJI VEC MAIL")
+      return;
+    }
+
+    osoba = new Osoba(ime, prezime, mail, datum_rod, rod, password1);
+    await osoba.persist();
 })
 
 module.exports = router;

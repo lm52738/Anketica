@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require ("../db/index.js")
+const jwt = require('jsonwebtoken');
+const Osoba = require("../models/osoba.models.js");
 
 router.get("/", function(req, res, next) {
     res.send("LOGIN PAGE");
@@ -14,20 +16,24 @@ router.post ("/", async (req,res) => {
     console.log (mail);
     console.log (password);
 
-    const sql = `SELECT *
-    FROM osobe WHERE mail = '` + mail + `' AND password = '` + password + `'`;
+    let osoba = await Osoba.fetchByEmail(mail);
 
-    const result = await (await db.query(sql, [])).rows;
-    console.log("SQL:");
-    console.log(result);
+    if (osoba.id === undefined || !osoba.checkPassword(password)) {
 
-    if (result[0] == undefined){
-        console.log("OSOBA NE POSTOJI U BAZI");
+        console.log("OSOBA NE POSTOJI U BAZI ILI JE KRIVA LOZINKA");
+        res.status(400).json("Email or password incorrect!"); 
+        res.json({auth: false, message: "no user exists"});
         //treba redirectat opet na home page
         return;
-    }
 
-    console.log("OSOBA POSTOJI");
-})
+    } else {
+        
+        console.log("OSOBA POSTOJI");
+        const token = jwt.sign({id: osoba.id,mail: osoba.mail},"jwtSecret",{
+            expiresIn: 300,
+        })
+        res.json({auth: true, token: token, osoba: osoba});  
+    }
+});
 
 module.exports = router;
