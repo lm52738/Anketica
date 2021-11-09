@@ -18,18 +18,18 @@ U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
     "pitanja": [{
             "tip": "0",
             "tekstPitanja": "u koliko sati se dizes ujutro ~ tip 0 je jedan tocan odg",
-            "odgovori": ["8", "9", "10"]
+            "moguceOpcije": ["8", "9", "10"]
         },
 
         {
             "tip": "1",
             "tekstPitanja": "Sto cesto jedes za dorucak ~ tip 1 je vise mogucih tocnih",
-            "odgovori": ["palacinke", "sendvic", "pahuljice"]
+            "moguceOpcije": ["palacinke", "sendvic", "pahuljice"]
         },
         {
             "tip": "2",
             "tekstPitanja": "Kako bi opisao svoj dan ~ tip 2 je free response, odgovori neka bude ovdje ali prazno",
-            "odgovori": []
+            "moguceOpcije": []
         }
     ]
 
@@ -53,15 +53,20 @@ router.post('/',
         console.log(stvorio, imeAnkete, opis)
 
         let idAnkete = (await stvoriAnketu(imeAnkete) )['rows'][0]['id']
-        console.log("STVORENA ANKETA ID: " + idAnkete)
+        console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
         for (const pitanje of pitanja) {
             console.log("~~~~~~~~~~~~~~~~~~~~~~")
             let tipPitanja = pitanje['tip']
             let tekstPitanja = pitanje['tekstPitanja']
-            let odgovori = pitanje['odgovori']
+            let moguceOpcije = pitanje['moguceOpcije']
 
             let idPitanja = (await stvoriPitanje(tekstPitanja, tipPitanja, idAnkete  ) )['rows'][0]['id']
-            console.log("STVORENO PITANJE ID: " + idPitanja)
+            console.log("STVOREN ENTRY PITANJE, ID: " + idPitanja)
+
+            console.log("MOGUCE OPCIJE SU: " + moguceOpcije)
+            let idMoguceOpcije = (await stvoriMoguceOpcije(idPitanja, moguceOpcije))['rows'][0]['id']
+            console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + idPitanja)
+
         }
 
         res.sendStatus(200)
@@ -74,6 +79,10 @@ let stvoriAnketu = function(imeAnkete){
 let stvoriPitanje = function(tekstPitanja, idTipaPitanja, idAnkete){
 
     return db.query("INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete) values('" + tekstPitanja + "', '" + idTipaPitanja + "', '" + idAnkete + "') returning id")
+}
+
+let stvoriMoguceOpcije = function(idPitanja, moguceOpcijeTekst ){
+    return db.query("INSERT INTO moguce_opcije(id_pitanja, tekst) values('" + idPitanja + "', '" + moguceOpcijeTekst + "') returning id")
 }
 
 module.exports = router;

@@ -128,10 +128,7 @@ CREATE TABLE moguce_opcije
 (
     id                     int  not null DEFAULT nextval('moguce_opcije_SEQ'),
     id_pitanja             int references pitanja (id),
-    id_odgovori_na_pitanja int references odgovori_na_pitanja (id),
     tekst                  text not null,
 
     CONSTRAINT moguce_opcije_pk PRIMARY KEY (id)
-
-
 );
