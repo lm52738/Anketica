@@ -13,6 +13,7 @@ const usersRouter = require("./routes/users");
 const testAPIRouter = require("./routes/testAPI");
 const loginRouter = require('./routes/login');
 const signupRouter = require('./routes/signup');
+const anketaRouter = require('./routes/anketa');
 
 
 const app = express();
@@ -31,6 +32,7 @@ app.use("/login", loginRouter);
 app.use("/signup", signupRouter);
 app.use("/users", usersRouter);
 app.use("/testAPI", testAPIRouter);
+app.use("/anketa", anketaRouter);
 
 
 
@@ -59,8 +61,6 @@ const pool = new Pool({
   password: 'bazepodataka',
   port: 5432,
 })
-
-
 
 
 module.exports = app;

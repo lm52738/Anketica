@@ -67,15 +67,7 @@ CREATE TABLE tip_pitanja
     CONSTRAINT tip_pitanja_pk PRIMARY KEY (id)
 );
 
-CREATE SEQUENCE pitanja_SEQ INCREMENT BY 1 MINVALUE 0;
-CREATE TABLE pitanja
-(
-    id             int  not null DEFAULT nextval('pitanja_SEQ'),
-    tekst          text not null,
-    id_tip_pitanja int references tip_pitanja (id),
 
-    CONSTRAINT pitanja_pk PRIMARY KEY (id)
-);
 
 CREATE SEQUENCE ankete_SEQ INCREMENT BY 1 MINVALUE 0;
 CREATE TABLE ankete
@@ -85,6 +77,8 @@ CREATE TABLE ankete
 
     CONSTRAINT ankete_pk PRIMARY KEY (id)
 );
+
+
 CREATE SEQUENCE slanje_ankete_SEQ INCREMENT BY 1 MINVALUE 0;
 CREATE TABLE slanje_ankete
 (
@@ -95,6 +89,18 @@ CREATE TABLE slanje_ankete
 
     CONSTRAINT slanje_ankete_pk PRIMARY KEY (id)
 );
+
+CREATE SEQUENCE pitanja_SEQ INCREMENT BY 1 MINVALUE 0;
+CREATE TABLE pitanja
+(
+    id             int  not null DEFAULT nextval('pitanja_SEQ'),
+    tekst          text not null,
+    id_tip_pitanja int references tip_pitanja (id),
+    id_ankete      int references ankete (id),
+
+    CONSTRAINT pitanja_pk PRIMARY KEY (id)
+);
+
 CREATE SEQUENCE vlastite_ankete_SEQ INCREMENT BY 1 MINVALUE 0;
 CREATE TABLE vlastite_ankete
 (
@@ -109,23 +115,23 @@ CREATE TABLE vlastite_ankete
 CREATE SEQUENCE odgovori_na_pitanja_SEQ INCREMENT BY 1 MINVALUE 0;
 CREATE TABLE odgovori_na_pitanja
 (
-    id               int not null DEFAULT nextval('odgovori_na_pitanja_SEQ'),
+    id               int  not null DEFAULT nextval('odgovori_na_pitanja_SEQ'),
     id_osobe         int references osobe (id),
     id_slanje_ankete int references slanje_ankete (id),
     id_pitanja       int references pitanja (id),
-    tekst text not null,
+    tekst            text not null,
 
     CONSTRAINT odgovori_na_pitanja_pk PRIMARY KEY (id)
 );
 CREATE SEQUENCE moguce_opcije_SEQ INCREMENT BY 1 MINVALUE 0;
-CREATE TABLE moguce_opcije(
-    id int not null  DEFAULT nextval('moguce_opcije_SEQ'),
-    id_pitanja       int references pitanja (id),
-    id_odgovori_na_pitanja int references odgovori_na_pitanja(id),
-    tekst text not null,
+CREATE TABLE moguce_opcije
+(
+    id                     int  not null DEFAULT nextval('moguce_opcije_SEQ'),
+    id_pitanja             int references pitanja (id),
+    id_odgovori_na_pitanja int references odgovori_na_pitanja (id),
+    tekst                  text not null,
 
     CONSTRAINT moguce_opcije_pk PRIMARY KEY (id)
-
 
 
 );
