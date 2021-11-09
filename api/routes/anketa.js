@@ -6,6 +6,40 @@ const bodyParser = require('body-parser');
 
 router.use(bodyParser.json({ type: 'application/*+json' }))
 
+
+/*
+U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
+
+{
+    "anketa":    {
+    "stvorio": "nekiUsername",
+    "ime": "test anketa",
+    "opis": "JAKO SUPER ANKETA KOJA JE SUPAC SUPAC SUP",
+    "pitanja": [{
+            "tip": "0",
+            "tekstPitanja": "u koliko sati se dizes ujutro ~ tip 0 je jedan tocan odg",
+            "odgovori": ["8", "9", "10"]
+        },
+
+        {
+            "tip": "1",
+            "tekstPitanja": "Sto cesto jedes za dorucak ~ tip 1 je vise mogucih tocnih",
+            "odgovori": ["palacinke", "sendvic", "pahuljice"]
+        },
+        {
+            "tip": "2",
+            "tekstPitanja": "Kako bi opisao svoj dan ~ tip 2 je free response, odgovori neka bude ovdje ali prazno",
+            "odgovori": []
+        }
+    ]
+
+    }
+}
+
+*/
+
+
+
 /* GET home page. */
 router.post('/',
     async function (req, res, next) {
