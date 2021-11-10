@@ -15,7 +15,8 @@ module.exports = class Osoba {
 
         //Ana nekuzim kaj je ovo?
         get age() {
-            return (new Date()).getFullYear() - this.DOB.getFullYear();
+            date = new Date()
+            return date.getFullYear() - this.DOB.getFullYear();
         }
         get formattedOsoba() {
             return ((this.rod == 'm') ? 'Mr. ' : 'Mrs.') +
@@ -58,7 +59,7 @@ module.exports = class Osoba {
 
         //provjera zaporke
         checkPassword(password) {
-            return this.password ? this.password == password : false
+            return this.password === password;
         }
 
         //pohrana korisnika u bazu podataka
@@ -102,7 +103,7 @@ dbNewOsoba = async (osoba) => {
     const sql = "INSERT INTO osobe ( ime, prezime, mail, datum_rod, rod, password)" +
      " VALUES ('" + osoba.ime + "','" + osoba.prezime + "','" + osoba.mail + "','" + osoba.datum_rod 
      + "','" + osoba.rod + "','" + osoba.password + "') RETURNING id";
-
+    
     try {
         const result = await db.query(sql, []);
         return result.rows[0].id;
