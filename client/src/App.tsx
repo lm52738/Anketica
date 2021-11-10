@@ -1,8 +1,6 @@
-import { Box, ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
-import { Auth } from "components/auth/Auth";
-import { Header } from "components/Header";
-import { Hero } from "components/Hero";
-import { NewSurveyForm } from "components/WIP";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import Authentification from "pages/Authentification";
+import NewSurvey from "pages/NewSurvey";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
@@ -31,25 +29,10 @@ export const App = () => {
       <ChakraProvider resetCSS theme={theme}>
         <Switch>
           <Route path={["/", "/home"]} exact>
-            <Flex
-              h="full"
-              direction="row"
-              justify="space-between"
-              align="center"
-              p={{
-                base: 0,
-                md: "6",
-              }}
-              maxW="1440px"
-              mx="auto"
-            >
-              <Hero />
-              <Auth />
-            </Flex>
+            <Authentification />
           </Route>
           <Route path="/new-survey" exact>
-            <Header />
-            <NewSurveyForm />
+            <NewSurvey />
           </Route>
         </Switch>
       </ChakraProvider>

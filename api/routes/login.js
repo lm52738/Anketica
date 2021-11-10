@@ -4,10 +4,6 @@ const db = require("../db/index.js");
 const jwt = require("jsonwebtoken");
 const Osoba = require("../models/osoba.models.js");
 
-router.get("/", function (req, res, next) {
-  res.send("LOGIN PAGE");
-});
-
 router.post("/", async (req, res) => {
   console.log("u postu sam login");
 
@@ -15,6 +11,8 @@ router.post("/", async (req, res) => {
   const password = req.body.password;
 
   let osoba = await Osoba.fetchByEmail(mail);
+
+  
 
   if (osoba.id === undefined || !osoba.checkPassword(password)) {
     return res.sendStatus(403);
@@ -31,7 +29,7 @@ router.post("/", async (req, res) => {
       }
     );
 
-    res.json({
+    return res.json({
       token: token,
       osoba: osoba,
     });

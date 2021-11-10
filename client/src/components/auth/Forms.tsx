@@ -15,6 +15,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { MdClose } from "react-icons/md";
 import { useHistory } from "react-router";
 import { PrimaryButton, SecondaryButton } from "../shared/Buttons";
+import axios from "axios";
 
 interface Props {
   switchFormMode: VoidFunction;
@@ -37,33 +38,19 @@ export const LoginForm: FC<Props> = ({ switchFormMode }) => {
       password: "",
     },
   });
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const login: SubmitHandler<LoginFormFields> = async (data) => {
+    setAuthError(null);
 
-    const allData = {
-      ...data,
-    };
-    console.log(allData);
-
-    // TODO: implement
-    fetch('http://localhost:9000/login', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(allData),
-    })
-    .catch(err => {
-        console.log(err);
-    });
-
-
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(null);
-      }, 2000);
-    });
-    push("new-survey");
+    try {
+      const response = await axios.post("http://localhost:9000/login", data);
+      console.log(response.status);
+      push("/new-survey");
+    } catch (err) {
+      console.log(err);
+      setAuthError("Invalid credentials!");
+    }
   };
 
   return (
@@ -88,6 +75,7 @@ export const LoginForm: FC<Props> = ({ switchFormMode }) => {
           <FormLabel>Password</FormLabel>
           <Input {...register("password")} type="password" />
         </Box>
+        {authError != null && <Box color="red.400">{authError}</Box>}
         <PrimaryButton
           type="submit"
           isLoading={isSubmitting}
@@ -141,18 +129,16 @@ export const SignUpForm: FC<Props> = ({ switchFormMode }) => {
       gender,
     };
 
-
     console.log(allData);
 
-    fetch('http://localhost:9000/signup', {
-      method: 'POST',
+    fetch("http://localhost:9000/signup", {
+      method: "POST",
       headers: {
-          'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(allData),
-    })
-    .catch(err => {
-        console.log(err);
+    }).catch((err) => {
+      console.log(err);
     });
 
     // validation
