@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require ("../db/index.js")
 const Osoba = require('../models/osoba.models')
+const bcrypt = require("bcrypt");
 
 router.get("/", function(req, res, next) {
     res.send("SIGN UP PAGE");
@@ -48,7 +49,9 @@ router.post ("/", async (req,res) => {
       return;
     }
 
-    osoba = new Osoba(ime, prezime, mail, datum_rod, rod, password1);
+    const salt = bcrypt.genSaltSync(12);
+    const hash = bcrypt.hashSync(password1, salt);
+    osoba = new Osoba(ime, prezime, mail, datum_rod, rod, hash);
     await osoba.persist();
 })
 

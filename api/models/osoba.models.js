@@ -1,4 +1,5 @@
 const db = require('../db')
+const bcrypt = require("bcrypt");
 
 module.exports = class Osoba {
         constructor(ime, prezime, mail, datum_rod, rod, password) {
@@ -59,7 +60,7 @@ module.exports = class Osoba {
 
         //provjera zaporke
         checkPassword(password) {
-            return this.password === password;
+            return bcrypt.compareSync(password,this.password);
         }
 
         //pohrana korisnika u bazu podataka
@@ -112,9 +113,3 @@ dbNewOsoba = async (osoba) => {
         throw err
     }
 }
-
-/* 
-OsobaClass.prototype.toString = function() {
-    return this.formattedAuthor;
-}
-module.exports = OsobaClass; */
