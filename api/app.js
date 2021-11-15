@@ -58,6 +58,8 @@ app.use(function(err, req, res, next) {
 
 
 const Pool = require('pg').Pool
+
+// zasto imamo 2 poola (ovdje i u db/index.js)
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',

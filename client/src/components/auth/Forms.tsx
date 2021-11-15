@@ -123,31 +123,14 @@ export const SignUpForm: FC<Props> = ({ switchFormMode }) => {
   const [gender, setGender] = useState<GenderType>("other");
 
   const signUp: SubmitHandler<SignUpFormFields> = async (data) => {
-    // TODO: implement
     const allData = {
       ...data,
       gender,
     };
 
-    console.log(allData);
-
-    fetch("http://localhost:9000/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(allData),
-    }).catch((err) => {
-      console.log(err);
-    });
+    await axios.post("http://localhost:9000/signup", allData);
 
     // validation
-
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(null);
-      }, 2000);
-    });
     push("new-survey");
   };
 
