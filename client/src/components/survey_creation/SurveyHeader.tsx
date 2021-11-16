@@ -74,8 +74,9 @@ export const SurveyHeader = () => {
     const allData = {
       title,
       description,
-      ...questions,
+      questions,
     };
+
     await axios.post("http://localhost:9000/anketa", allData);
   });
 
