@@ -16,6 +16,7 @@ export interface SurveyContext {
   removeQuestion: (questionIndex: number) => void;
   setSelectedQuestion: (questionIndex: number) => void;
   editQuestion: (questionIndex: number, editedQuestion: Question) => void;
+  removeEmptyQuestions: () => void;
 }
 
 export type Questions = Question[];
@@ -34,6 +35,7 @@ const initialState: SurveyContext = {
   removeQuestion: () => {},
   setSelectedQuestion: () => {},
   editQuestion: () => {},
+  removeEmptyQuestions: () => {},
 };
 
 const surveyContext = createContext<SurveyContext>(initialState);
@@ -54,6 +56,10 @@ export const SurveyProvider: FC = ({ children }) => {
   const setSelectedQuestion = (questionIndex: number) => {
     setSelectedQuestionIndex(questionIndex);
   };
+
+  const removeEmptyQuestions = () => {
+    setQuestions(questions.filter(question => question.answers.length !== 0 && question.question !== ''));
+  }
 
   const editQuestion = (questionIndex: number, editedQuestion: Question) => {
     if (
@@ -78,6 +84,7 @@ export const SurveyProvider: FC = ({ children }) => {
         removeQuestion,
         setSelectedQuestion,
         editQuestion,
+        removeEmptyQuestions,
       }}
     >
       {children}

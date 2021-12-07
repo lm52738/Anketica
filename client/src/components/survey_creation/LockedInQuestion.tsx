@@ -1,4 +1,4 @@
-import { Flex, Heading } from "@chakra-ui/react";
+import { Flex, Heading, Text } from "@chakra-ui/react";
 import { Question, useSurvey } from "context/Survey";
 import React, { FC } from "react";
 import { Answers } from "./EditableQuestionBody";
@@ -25,6 +25,12 @@ export const LockedInQuestion: FC<Props> = ({ index, ...questionProps }) => {
         {questionProps.question}
       </Heading>
       <Answers {...questionProps} />
+
+      {questionProps.isRequired ? (
+        <Text align="end" fontSize="sm">
+          Required
+        </Text>
+      ) : null}
     </Flex>
   );
 };

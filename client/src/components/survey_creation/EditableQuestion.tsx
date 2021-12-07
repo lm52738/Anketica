@@ -8,6 +8,8 @@ import {
   TabList,
   Tabs,
   VStack,
+  Checkbox,
+  Text,
 } from "@chakra-ui/react";
 import { Question, QuestionMode, useSurvey } from "context/Survey";
 import React, { FC, useState } from "react";
@@ -137,6 +139,21 @@ export const EditableQuestion: FC<Props> = ({ index, ...questionProps }) => {
               }}
             />
           )}
+          <Flex pt="5" justifyContent="end">
+            <Text pr="2">Required</Text>
+            <Checkbox
+              defaultChecked={question.isRequired}
+              onChange={(e) => {
+                const editedQuestion: Question = {
+                  ...question,
+                  isRequired: e.target.checked,
+                };
+                setQuestion(editedQuestion);
+
+                editQuestion(index, editedQuestion);
+              }}
+            />
+          </Flex>
         </Flex>
       </Box>
 
