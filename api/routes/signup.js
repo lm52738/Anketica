@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require ("../db/index.js")
 const Osoba = require('../models/osoba.models')
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 
 router.get("/", function(req, res, next) {
     res.send("SIGN UP PAGE");
@@ -21,7 +23,7 @@ router.post ("/", async (req,res) => {
 
     switch(rod) {
         case 'male':
-            rod = 'm'
+            rod = 'm';
           break;
         case 'female':
             rod = 'f';
@@ -53,6 +55,22 @@ router.post ("/", async (req,res) => {
     const hash = bcrypt.hashSync(password1, salt);
     osoba = new Osoba(ime, prezime, mail, datum_rod, rod, hash);
     await osoba.persist();
+
+    const token = jwt.sign(
+      {
+        id: osoba.id,
+        mail: osoba.mail,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    return res.json({
+      token: token,
+      osoba: osoba,
+    });
 })
 
 module.exports = router;

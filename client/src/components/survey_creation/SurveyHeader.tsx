@@ -77,7 +77,14 @@ export const SurveyHeader = () => {
       questions,
     };
 
-    await axios.post("http://localhost:9000/anketa", allData);
+    const token = JSON.parse(localStorage.getItem("user")!).token;
+    const headers = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    };
+
+    await axios.post("http://localhost:9000/anketa", allData, headers);
   });
 
   return (

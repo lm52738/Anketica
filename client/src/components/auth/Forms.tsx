@@ -45,7 +45,11 @@ export const LoginForm: FC<Props> = ({ switchFormMode }) => {
 
     try {
       const response = await axios.post("http://localhost:9000/login", data);
-      console.log(response.status);
+      
+      if (response.data.token) {
+        localStorage.setItem("user", JSON.stringify(response.data));
+      }
+      
       push("/new-survey");
     } catch (err) {
       console.log(err);
@@ -128,7 +132,12 @@ export const SignUpForm: FC<Props> = ({ switchFormMode }) => {
       gender,
     };
 
-    await axios.post("http://localhost:9000/signup", allData);
+    const response = await axios.post("http://localhost:9000/signup", allData);
+
+    if (response.data.token) {
+      localStorage.setItem("user", JSON.stringify(response.data));
+    }
+    
 
     // validation
     push("new-survey");

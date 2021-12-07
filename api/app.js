@@ -36,7 +36,7 @@ app.use("/signup", signupRouter);
 app.use("/users", usersRouter);
 app.use("/testAPI", testAPIRouter);
 app.use("/anketa", anketaRouter);
-app.use("/profile-page",profileRouter);
+app.use("/profile",profileRouter);
 
 
 

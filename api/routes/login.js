@@ -4,6 +4,7 @@ const db = require("../db/index.js");
 const jwt = require("jsonwebtoken");
 const Osoba = require("../models/osoba.models.js");
 
+
 router.post("/", async (req, res) => {
   console.log("u postu sam login");
 
@@ -11,8 +12,6 @@ router.post("/", async (req, res) => {
   const password = req.body.password;
 
   let osoba = await Osoba.fetchByEmail(mail);
-
-  
 
   if (osoba.id === undefined || !osoba.checkPassword(password)) {
     return res.sendStatus(403);
@@ -25,7 +24,7 @@ router.post("/", async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '1d',
+        expiresIn: "1d",
       }
     );
 

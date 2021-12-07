@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require ("../db/index.js")
 const bodyParser = require('body-parser');
+const jwt = require("jsonwebtoken");
 
 
 router.use(bodyParser.json({ type: 'application/*+json' }))
@@ -38,36 +39,51 @@ U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
 
 */
 
-
-
-/* GET home page. */
-router.post('/',
-    async function (req, res, next) {
-        let jsonData = await req.body['anketa']
-
-        let stvorio = jsonData['stvorio']
-        let imeAnkete = jsonData['ime']
-        let opis = jsonData['opis']
-
-        let pitanja = jsonData['pitanja']
-        console.log(stvorio, imeAnkete, opis)
-
-        let idAnkete = (await stvoriAnketu(imeAnkete) )['rows'][0]['id']
-        console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
-        for (const pitanje of pitanja) {
-            console.log("~~~~~~~~~~~~~~~~~~~~~~")
-            let tipPitanja = pitanje['tip']
-            let tekstPitanja = pitanje['tekstPitanja']
-            let moguceOpcije = pitanje['moguceOpcije']
-
-            let idPitanja = (await stvoriPitanje(tekstPitanja, tipPitanja, idAnkete  ) )['rows'][0]['id']
-            console.log("STVOREN ENTRY PITANJE, ID: " + idPitanja)
-
-            console.log("MOGUCE OPCIJE SU: " + moguceOpcije)
-            let idMoguceOpcije = (await stvoriMoguceOpcije(idPitanja, moguceOpcije))['rows'][0]['id']
-            console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + idPitanja)
-
+const verifyToken = (req, res, next) => {
+    const bearerHeader = req.headers["authorization"];
+  
+    if (typeof bearerHeader !== "undefined") {
+      const token = bearerHeader.split(" ")[1];
+      req.token = token;
+  
+      jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+          return res.sendStatus(403);
         }
+  
+        req.user = user;
+  
+        next();
+      });
+    } else {
+      res.sendStatus(401);
+    }
+  };
+
+router.post('/', verifyToken,
+    async function (req, res, next) {
+        
+        // TODO bude jos toga
+        let {title, description, questions} = req.body;
+
+        
+        
+        // let idAnkete = (await stvoriAnketu(imeAnkete) )['rows'][0]['id']
+        // console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
+        // for (const pitanje of pitanja) {
+        //     console.log("~~~~~~~~~~~~~~~~~~~~~~")
+        //     let tipPitanja = pitanje['tip']
+        //     let tekstPitanja = pitanje['tekstPitanja']
+        //     let moguceOpcije = pitanje['moguceOpcije']
+
+        //     let idPitanja = (await stvoriPitanje(tekstPitanja, tipPitanja, idAnkete  ) )['rows'][0]['id']
+        //     console.log("STVOREN ENTRY PITANJE, ID: " + idPitanja)
+
+        //     console.log("MOGUCE OPCIJE SU: " + moguceOpcije)
+        //     let idMoguceOpcije = (await stvoriMoguceOpcije(idPitanja, moguceOpcije))['rows'][0]['id']
+        //     console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + idPitanja)
+
+        // }
 
         res.sendStatus(200)
     });
@@ -85,4 +101,5 @@ let stvoriMoguceOpcije = function(idPitanja, moguceOpcijeTekst ){
     return db.query("INSERT INTO moguce_opcije(id_pitanja, tekst) values('" + idPitanja + "', '" + moguceOpcijeTekst + "') returning id")
 }
 
+exports.verifyToken = verifyToken;
 module.exports = router;
