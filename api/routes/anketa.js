@@ -1,105 +1,91 @@
 const express = require('express');
 const router = express.Router();
-const db = require ("../db/index.js")
+const db = require("../db/index.js")
 const bodyParser = require('body-parser');
-const jwt = require("jsonwebtoken");
 
 
-router.use(bodyParser.json({ type: 'application/*+json' }))
+router.use(bodyParser.json({type: 'application/*+json'}))
 
 
 /*
 U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
 
 {
-    "anketa":    {
-    "stvorio": "nekiUsername",
-    "ime": "test anketa",
-    "opis": "JAKO SUPER ANKETA KOJA JE SUPAC SUPAC SUP",
-    "pitanja": [{
-            "tip": "0",
-            "tekstPitanja": "u koliko sati se dizes ujutro ~ tip 0 je jedan tocan odg",
-            "moguceOpcije": ["8", "9", "10"]
-        },
-
-        {
-            "tip": "1",
-            "tekstPitanja": "Sto cesto jedes za dorucak ~ tip 1 je vise mogucih tocnih",
-            "moguceOpcije": ["palacinke", "sendvic", "pahuljice"]
-        },
-        {
-            "tip": "2",
-            "tekstPitanja": "Kako bi opisao svoj dan ~ tip 2 je free response, odgovori neka bude ovdje ali prazno",
-            "moguceOpcije": []
+    "creator": "userId", // ovo nam basically isto ne treba u requestu jer ces preko bearer tokena moc saznat koji je user poslao, tako da ja bi idealno samo token slao u headeru umjesto ovoga
+    "title": "test anketa",
+    "description": "JAKO SUPER ANKETA KOJA JE SUPAC SUPAC SUP",
+    "questions": [{
+            "mode": "radio", // (ili "text" ili "checkbox"), mozemo i s brojevima ako zelis, svejedno
+            "question": "u koliko sati se dizes ujutro ~ tip 0 je jedan tocan odg",
+            "answers": ["8", "9", "10"],   // za text saljem praznu listu valjda, nije ni bitno
+            "isRequired": true   //novo
         }
-    ]
-
-    }
+    ],
+    // sve dalje je isto novo
+    "groupName": "Ime grupe",
+    "emails": ["hrvoje@hotmails.com", "example@gmail.com"],
+    "emailTitle": "Header poruke",
+    "emailMessage": "Pocetni tekst poruke" //nakon kojeg dode i link na anketu ili nes
 }
 
 */
 
-const verifyToken = (req, res, next) => {
-    const bearerHeader = req.headers["authorization"];
-  
-    if (typeof bearerHeader !== "undefined") {
-      const token = bearerHeader.split(" ")[1];
-      req.token = token;
-  
-      jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-          return res.sendStatus(403);
-        }
-  
-        req.user = user;
-  
-        next();
-      });
-    } else {
-      res.sendStatus(401);
-    }
-  };
 
-router.post('/', verifyToken,
+router.get('/',
     async function (req, res, next) {
-        
-        // TODO bude jos toga
-        let {title, description, questions} = req.body;
-
-        
-        
-        // let idAnkete = (await stvoriAnketu(imeAnkete) )['rows'][0]['id']
-        // console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
-        // for (const pitanje of pitanja) {
-        //     console.log("~~~~~~~~~~~~~~~~~~~~~~")
-        //     let tipPitanja = pitanje['tip']
-        //     let tekstPitanja = pitanje['tekstPitanja']
-        //     let moguceOpcije = pitanje['moguceOpcije']
-
-        //     let idPitanja = (await stvoriPitanje(tekstPitanja, tipPitanja, idAnkete  ) )['rows'][0]['id']
-        //     console.log("STVOREN ENTRY PITANJE, ID: " + idPitanja)
-
-        //     console.log("MOGUCE OPCIJE SU: " + moguceOpcije)
-        //     let idMoguceOpcije = (await stvoriMoguceOpcije(idPitanja, moguceOpcije))['rows'][0]['id']
-        //     console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + idPitanja)
-
-        // }
-
         res.sendStatus(200)
     });
 
-let stvoriAnketu = function(imeAnkete){
+router.post('/',
+    async function (req, res, next) {
+        console.log("tu sam")
+        let {creator, title, description, questions} = req.body;
+        console.log("~~~~~~~~~~~")
+        console.log(req.body)
+        console.log("~~~~~~~~~~~")
+        console.log(creator, title, description, questions)
+
+        let idAnkete = (await createAnketa(title))['rows'][0]['id']
+        console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
+        for (const questionIter of questions) {
+            console.log("~~~~~~~~~~~~~~~~~~~~~~")
+            let {mode, question, answers} = questionIter;
+
+            let questionID = (await createQuestion(question, questionTypeStringToInt(mode), idAnkete))['rows'][0]['id']
+            console.log("STVOREN ENTRY PITANJE, ID: " + questionID)
+
+            console.log("MOGUCE OPCIJE SU: " + answers)
+            let answersID = (await createAnswers(questionID, answers))['rows'][0]['id']
+            console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + answersID)
+
+        }
+        res.sendStatus(200)
+    });
+
+let questionTypeStringToInt = function (stringVal) {
+    switch (stringVal) {
+        case "radio":
+            return 0;
+        case "text":
+            return 1;
+        case "checkbox" :
+            return 2;
+        default:
+            return -1;
+    }
+}
+
+let createAnketa = function (imeAnkete) {
 
     return db.query("INSERT INTO ankete(ime) values('" + imeAnkete + "') returning id")
 }
-let stvoriPitanje = function(tekstPitanja, idTipaPitanja, idAnkete){
+let createQuestion = function (tekstPitanja, idTipaPitanja, idAnkete) {
 
     return db.query("INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete) values('" + tekstPitanja + "', '" + idTipaPitanja + "', '" + idAnkete + "') returning id")
 }
 
-let stvoriMoguceOpcije = function(idPitanja, moguceOpcijeTekst ){
+let createAnswers = function (idPitanja, moguceOpcijeTekst) {
     return db.query("INSERT INTO moguce_opcije(id_pitanja, tekst) values('" + idPitanja + "', '" + moguceOpcijeTekst + "') returning id")
 }
 
-exports.verifyToken = verifyToken;
 module.exports = router;

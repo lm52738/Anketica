@@ -5,8 +5,7 @@ const pool = new Pool({
     user: 'projektadmin',
     host: '161.53.18.24',
     database: 'Ankete',
-    password: process.env.DB_PASSWORD,
-    
+    password: process.env.DB_PASSWORD
 });
 
 module.exports = {
