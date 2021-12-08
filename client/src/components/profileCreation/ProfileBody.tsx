@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Flex, Text, VStack } from "@chakra-ui/react";
+import { BsFillPersonFill  } from "react-icons/bs";
 
 interface User {
   id: number,
@@ -63,12 +64,12 @@ export const ProfileBody = () => {
       mx="auto"
       p="6"
       spacing="6"
-      mt="20"
     >
       <Flex direction="column" p="3">
         <VStack maxW="300px" mx="auto" align="start" spacing="6">
-          <>
+          <> 
             <Flex minW="full" justify="space-between">
+            <BsFillPersonFill size = {50}/> 
               <Text fontSize="3xl" fontWeight="bold">
                 Your profile
               </Text>
@@ -88,7 +89,7 @@ export const ProfileBody = () => {
               </Box>
               <Box minW="full">
                 <Text>Date of Birth:</Text>
-                <Text>{user?.datum_rod}</Text>
+                <Text>{user?.datum_rod.substring(0,10)}</Text>
               </Box>
               <Box minW="full">
                 <Text>Gender:</Text>
