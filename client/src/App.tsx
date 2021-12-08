@@ -1,6 +1,7 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Authentification from "pages/Authentification";
 import NewSurvey from "pages/NewSurvey";
+import Surveys from "components/Surveys";
 import ProfilePage from "pages/ProfilePage";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -31,6 +32,9 @@ export const App = () => {
         <Switch>
           <Route path={["/", "/home"]} exact>
             <Authentification />
+          </Route>
+          <Route path={["/", "/surveys"]} exact>
+            <Surveys />
           </Route>
           <Route path="/new-survey" exact>
             <NewSurvey />

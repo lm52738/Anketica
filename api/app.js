@@ -17,6 +17,7 @@ const loginRouter = require('./routes/login');
 const signupRouter = require('./routes/signup');
 const anketaRouter = require('./routes/anketa');
 const profileRouter = require('./routes/profile');
+const surveysRouter = require('./routes/surveys');
 
 
 const app = express();
@@ -37,6 +38,7 @@ app.use("/users", usersRouter);
 app.use("/testAPI", testAPIRouter);
 app.use("/anketa", anketaRouter);
 app.use("/profile",profileRouter);
+app.use("/surveys",surveysRouter);
 
 
 
