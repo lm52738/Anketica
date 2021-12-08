@@ -2,8 +2,17 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Flex, Text, VStack } from "@chakra-ui/react";
 
+interface User {
+  id: number,
+  ime: String,
+  prezime: String,
+  mail: String,
+  datum_rod: String,
+  rod: String,
+}
+
 export const ProfileBody = () => {
-  var [user, setUser] = useState([]);
+  var [user, setUser] = useState<User>();
 
   const getUserData = () => {
     const token = JSON.parse(localStorage.getItem("user")!).token;
@@ -13,7 +22,7 @@ export const ProfileBody = () => {
       },
     };
 
-    axios.get("http://localhost:9000/profile", headers).then((response) => {
+    axios.get<User>("http://localhost:9000/profile", headers).then((response) => {
         console.log(response.data);
       setUser(response.data);
     });
@@ -67,23 +76,23 @@ export const ProfileBody = () => {
             <VStack as="form" spacing="6" align="start" minW="full">
               <Box minW="full">
                 <Text>First name:</Text>
-                <Text>{user.ime}</Text>
+                <Text>{user?.ime}</Text>
               </Box>
               <Box minW="full">
                 <Text>Last name:</Text>
-                <Text>{user.prezime}</Text>
+                <Text>{user?.prezime}</Text>
               </Box>
               <Box minW="full">
                 <Text>Email:</Text>
-                <Text>{user.mail}</Text>
+                <Text>{user?.mail}</Text>
               </Box>
               <Box minW="full">
                 <Text>Date of Birth:</Text>
-                <Text>{user.datum_rod}</Text>
+                <Text>{user?.datum_rod}</Text>
               </Box>
               <Box minW="full">
                 <Text>Gender:</Text>
-                <Text>{user.rod}</Text>
+                <Text>{user?.rod}</Text>
               </Box>
             </VStack>
           </>
