@@ -1,18 +1,37 @@
-import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Flex,
+  FormLabel,
+  HStack,
+  IconButton,
+  Input,
+  Radio,
+  RadioGroup,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import React, { FC, useState, useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { MdClose } from "react-icons/md";
+import { useHistory } from "react-router";
+import { PrimaryButton, SecondaryButton } from "../shared/Buttons";
 import axios from "axios";
-import { Box, Flex, Text, VStack } from "@chakra-ui/react";
 import { BsFillPersonFill  } from "react-icons/bs";
+
+interface Props {
+  switchFormMode: VoidFunction;
+}
 
 interface User {
   id: number,
-  ime: String,
-  prezime: String,
-  mail: String,
-  datum_rod: String,
-  rod: String,
+  ime: string,
+  prezime: string,
+  mail: string,
+  datum_rod: Date,
+  rod: string,
 }
 
-export const ProfileBody = () => {
+export const ProfileView: FC<Props> = ({ switchFormMode }) => {
   var [user, setUser] = useState<User>();
 
   const getUserData = () => {
@@ -32,73 +51,212 @@ export const ProfileBody = () => {
   useEffect(() => getUserData(), []);
 
   return (
-    <VStack
-      align="start"
-      minW={{
-        base: "100vw",
-        md: "300px",
-      }}
-      w="full"
-      maxW={{
-        base: "100vw",
-        md: "400px",
-      }}
-      minH={{
-        base: "100vh",
-        md: "400px",
-      }}
-      h="full"
-      maxH={{
-        base: "100vh",
-        md: "650px",
-      }}
-      bg="white"
-      boxShadow={{
-        base: "none",
-        md: "lg",
-      }}
-      borderRadius={{
-        base: "none",
-        md: "lg",
-      }}
-      mx="auto"
-      p="6"
-      spacing="6"
-    >
-      <Flex direction="column" p="3">
-        <VStack maxW="300px" mx="auto" align="start" spacing="6">
-          <> 
-            <Flex minW="full" justify="space-between">
-            <BsFillPersonFill size = {50}/> 
-              <Text fontSize="3xl" fontWeight="bold">
-                Your profile
-              </Text>
-            </Flex>
-            <VStack as="form" spacing="6" align="start" minW="full">
-              <Box minW="full">
-                <Text>First name:</Text>
-                <Text>{user?.ime}</Text>
-              </Box>
-              <Box minW="full">
-                <Text>Last name:</Text>
-                <Text>{user?.prezime}</Text>
-              </Box>
-              <Box minW="full">
-                <Text>Email:</Text>
-                <Text>{user?.mail}</Text>
-              </Box>
-              <Box minW="full">
-                <Text>Date of Birth:</Text>
-                <Text>{user?.datum_rod.substring(0,10)}</Text>
-              </Box>
-              <Box minW="full">
-                <Text>Gender:</Text>
-                <Text>{user?.rod}</Text>
-              </Box>
-            </VStack>
-          </>
+      <>
+        <Flex minW="full">
+          <BsFillPersonFill size = {50}/> 
+          <Text fontSize="3xl" fontWeight="bold">
+              Your profile
+          </Text>
+        </Flex>
+        <VStack
+          as="form"
+          spacing="6"
+          align="start"
+          minW="full"
+        >
+          <Box minW="full">
+              <Text>First name:</Text>
+              <Text>{user?.ime}</Text>
+          </Box>
+          <Box minW="full">
+              <Text>Last name:</Text>
+              <Text> {user?.prezime}</Text>
+          </Box>
+          <Box minW="full">
+              <Text>Email:</Text>
+              <Text>{user?.mail}</Text>
+          </Box>
+          <Box minW="full">
+              <Text>Date of Birth:</Text>
+              <Text>{user?.datum_rod.toString().substring(0,10)}</Text>
+          </Box>
+          <Box minW="full">
+              <Text>Gender:</Text>
+              <Text>{user?.rod}</Text>
+          </Box>
         </VStack>
+        <Box minW="full">        
+          <SecondaryButton onClick={switchFormMode}>Edit profile</SecondaryButton>
+        </Box>
+      </>
+    );
+};
+
+type GenderType = "male" | "female" | "other";
+interface ProfileForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  verifyPassword: string;
+}
+
+export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
+  var [user, setUser] = useState<User>();
+
+  const getUserData = () => {
+    const token = JSON.parse(localStorage.getItem("user")!).token;
+    const headers = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    };
+
+    axios.get<User>("http://localhost:9000/profile", headers).then((response) => {
+        console.log(response.data);
+      setUser(response.data);
+    });
+  };
+
+  useEffect(() => getUserData(), []);
+
+  const { push } = useHistory();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<ProfileForm>({
+    defaultValues: {
+      firstName: user?.ime,
+      lastName: user?.prezime,
+      email: user?.mail,
+      password: "",
+      verifyPassword: ""
+    },
+  });
+
+  const [gender, setGender] = useState<GenderType>(() => {
+      if (user?.rod === "f"){
+          console.log("u ifu");
+          return "female";
+      } else if (user?.rod === "m") {
+          return "male";
+      } else {
+          return "other";
+      }
+  });
+
+  const id = user?.id;
+
+  const signUp: SubmitHandler<ProfileForm> = async (data) => {
+    console.log(data);
+    const allData = {
+      ...data,
+      gender,
+      id
+    };
+
+    const response = await axios.post("http://localhost:9000/profile", allData);
+
+    if (response.data.token) {
+      localStorage.setItem("user", JSON.stringify(response.data));
+    }
+    
+    // validation
+    push("surveys");
+  };
+
+  return (
+      
+    <>
+      <Flex justify="space-between" minW="full">
+        <Text fontSize="3xl" fontWeight="bold">
+          Edit Profile
+        </Text>
+        <IconButton
+          onClick={switchFormMode}
+          aria-label="close edit form"
+          icon={<MdClose size="24px" />}
+          variant="ghost"
+        />
       </Flex>
-    </VStack>
+      <VStack
+        as="form"
+        minW="full"
+        align="start"
+        spacing="3"
+        onSubmit={handleSubmit(signUp)}
+      >
+        <HStack spacing="3">
+          <Box>
+            <FormLabel>First name</FormLabel>
+            <Input
+              {...register("firstName")}
+              required
+              disabled={isSubmitting}
+              type="text"
+              defaultValue={user?.ime}
+            />
+          </Box>
+          <Box>
+            <FormLabel>Last name</FormLabel>
+            <Input
+              {...register("lastName")}
+              required
+              disabled={isSubmitting}
+              type="text"
+              defaultValue={user?.prezime}
+            />
+          </Box>
+        </HStack>
+        <Box minW="full">
+          <FormLabel>E-mail</FormLabel>
+          <Input {...register("email")} type="email" value={user?.mail}/>
+        </Box>
+        <Box minW="full">
+          <FormLabel>Gender</FormLabel>
+          <RadioGroup
+            name="gender"
+            value={gender}
+            onChange={(newGender: GenderType) => {
+              setGender(newGender);
+            }}
+          >
+            <Flex justify="space-between" w="full">
+              <Radio value="male"> Male </Radio>
+              <Radio value="female"> Female </Radio>
+              <Radio value="other">Other</Radio>
+            </Flex>
+          </RadioGroup>
+        </Box>
+
+        <Box minW="full">
+          <FormLabel>Password</FormLabel>
+          <Input
+            {...register("password")}
+            required
+            disabled={isSubmitting}
+            type="password"
+          />
+        </Box>
+        <Box minW="full">
+          <FormLabel>Verify password</FormLabel>
+          <Input
+            {...register("verifyPassword")}
+            required
+            disabled={isSubmitting}
+            type="password"
+          />
+        </Box>
+
+        <PrimaryButton
+          type="submit"
+          isLoading={isSubmitting}
+          loadingText="Editing"
+        >
+          Edit
+        </PrimaryButton>
+      </VStack>
+    </>
   );
 };

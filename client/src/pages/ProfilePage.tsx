@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { ProfileImage } from "components/profileCreation/ProfileImage";
-import { ProfileBody } from "components/profileCreation/ProfileBody";
+import { AuthProfile } from "components/profileCreation/AuthProfile";
 import {Flex} from "@chakra-ui/react";
 
 const ProfilePage: FC = () => {
@@ -19,7 +19,7 @@ const ProfilePage: FC = () => {
       mx="auto"
     >
         <ProfileImage />
-        <ProfileBody />
+        <AuthProfile />
     </Flex>
     );
   };

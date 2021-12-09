@@ -50,7 +50,7 @@ export const LoginForm: FC<Props> = ({ switchFormMode }) => {
         localStorage.setItem("user", JSON.stringify(response.data));
       }
       
-      push("/new-survey");
+      push("/surveys");
     } catch (err) {
       console.log(err);
       setAuthError("Invalid credentials!");
@@ -140,7 +140,7 @@ export const SignUpForm: FC<Props> = ({ switchFormMode }) => {
     
 
     // validation
-    push("new-survey");
+    push("surveys");
   };
 
   return (

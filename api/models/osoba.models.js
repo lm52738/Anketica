@@ -53,6 +53,14 @@ module.exports = class Osoba {
             return newOsoba
         }
 
+        async editOsoba(ime, prezime, mail, rod) {
+            await dbEditOsoba(this.id,ime, prezime, mail, rod)
+            this.ime = ime;
+            this.prezime = prezime;
+            this.mail = mail;
+            this.rod = rod;
+        }
+
         //da li je korisnik pohranjen u bazu podataka?
         isPersisted() {
             return this.id !== undefined
@@ -108,6 +116,19 @@ dbNewOsoba = async (osoba) => {
     try {
         const result = await db.query(sql, []);
         return result.rows[0].id;
+    } catch (err) {
+        console.log(err);
+        throw err
+    }
+}
+
+dbEditOsoba = async (id,ime, prezime, mail, rod) => {
+    const sql = "UPDATE osobe SET ime = '" + ime + "', prezime = '" + prezime + "', mail = '" + mail + 
+    "', rod = '" + rod + "' WHERE id = '" + id + "'";
+    
+    try {
+        const result = await db.query(sql, []);
+        console.log(result.rows[0]);
     } catch (err) {
         console.log(err);
         throw err
