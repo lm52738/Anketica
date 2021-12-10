@@ -29,6 +29,7 @@ interface User {
   mail: string,
   datum_rod: Date,
   rod: string,
+  password: string,
 }
 
 export const ProfileView: FC<Props> = ({ switchFormMode }) => {
@@ -130,8 +131,8 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
       firstName: user?.ime,
       lastName: user?.prezime,
       email: user?.mail,
-      password: "",
-      verifyPassword: ""
+      password: user?.password,
+      verifyPassword: user?.password
     },
   });
 
