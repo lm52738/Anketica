@@ -1,10 +1,11 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const db = require("../db/index.js");
-const bodyParser = require("body-parser");
-const verifyToken = require("../middleware/verifyToken.js");
+const db = require("../db/index.js")
+const bodyParser = require('body-parser');
 
-router.use(bodyParser.json({ type: "application/*+json" }));
+
+router.use(bodyParser.json({type: 'application/*+json'}))
+
 
 /*
 U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
@@ -29,73 +30,73 @@ U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
 
 */
 
-router.get("/", async function (req, res, next) {
-  res.sendStatus(200);
-});
 
-router.post("/", verifyToken, async function (req, res, next) {
-  // console.log("tu sam")
-  // let {creator, title, description, questions} = req.body;
-  // console.log("~~~~~~~~~~~")
-  // console.log(req.body)
-  // console.log("~~~~~~~~~~~")
-  // console.log(creator, title, description, questions)
+router.get('/',
+    async function (req, res, next) {
+        res.sendStatus(200)
+    });
 
-  // let idAnkete = (await createAnketa(title))['rows'][0]['id']
-  // console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
-  // for (const questionIter of questions) {
-  //     console.log("~~~~~~~~~~~~~~~~~~~~~~")
-  //     let {mode, question, answers} = questionIter;
+router.post('/',
+    async function (req, res, next) {
+        console.log("tu sam")
+        let {creator, title, description, questions} = req.body;
+        console.log("~~~~~~~~~~~")
+        console.log(req.body)
+        console.log("~~~~~~~~~~~")
+        console.log(creator, title, description)
+        console.log(questions)
 
-  //     let questionID = (await createQuestion(question, questionTypeStringToInt(mode), idAnkete))['rows'][0]['id']
-  //     console.log("STVOREN ENTRY PITANJE, ID: " + questionID)
+        let idAnkete = (await createAnketa(title))['rows'][0]['id']
+        console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
+        for (const questionIter of questions) {
+            console.log("~~~~~~~~~~~~~~~~~~~~~~")
+            let {mode, question, answers} = questionIter;
 
-  //     console.log("MOGUCE OPCIJE SU: " + answers)
-  //     let answersID = (await createAnswers(questionID, answers))['rows'][0]['id']
-  //     console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + answersID)
+            let questionID = (await createQuestion(question, questionTypeStringToInt(mode), idAnkete))['rows'][0]['id']
+            console.log("STVOREN ENTRY PITANJE, ID: " + questionID)
 
-  // }
-  res.sendStatus(200);
-});
+            console.log("MOGUCE OPCIJE SU: " + answers)
+            let answersID = (await createAnswers(questionID, answers))['rows'][0]['id']
+            console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + answersID)
+
+        }
+
+
+        res.sendStatus(200)
+    });
 
 let questionTypeStringToInt = function (stringVal) {
-  switch (stringVal) {
-    case "radio":
-      return 0;
-    case "text":
-      return 1;
-    case "checkbox":
-      return 2;
-    default:
-      return -1;
-  }
-};
+    switch (stringVal) {
+        case "radio":
+            return 0;
+        case "text":
+            return 1;
+        case "checkbox" :
+            return 2;
+        default:
+            return -1;
+    }
+}
 
 let createAnketa = function (imeAnkete) {
-  return db.query(
-    "INSERT INTO ankete(ime) values('" + imeAnkete + "') returning id"
-  );
-};
+
+    return db.query("INSERT INTO ankete(ime) values('" + imeAnkete + "') returning id");
+}
 let createQuestion = function (tekstPitanja, idTipaPitanja, idAnkete) {
-  return db.query(
-    "INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete) values('" +
-      tekstPitanja +
-      "', '" +
-      idTipaPitanja +
-      "', '" +
-      idAnkete +
-      "') returning id"
-  );
-};
+
+    return db.query("INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete) values('" + tekstPitanja + "', '" + idTipaPitanja + "', '" + idAnkete + "') returning id");
+}
 
 let createAnswers = function (idPitanja, moguceOpcijeTekst) {
-  return db.query(
-    "INSERT INTO moguce_opcije(id_pitanja, tekst) values('" +
-      idPitanja +
-      "', '" +
-      moguceOpcijeTekst +
-      "') returning id"
-  );
-};
+    return db.query("INSERT INTO moguce_opcije(id_pitanja, tekst) values('" + idPitanja + "', '" + moguceOpcijeTekst + "') returning id");
+}
+
+let createSlanjeAnkete = function(idPitanja, datum, trajanje){
+    return db.query("INSERT INTO slanje_ankete(id_ankete, datum, trajanje) values('" + idPitanja + "', '" + datum +   "', '" + trajanje + "') returning id");
+}
+
+let createVlasitaAnketa = function(idSlanjeAnkete, id_osobe){
+    return db.query("INSERT INTO vlastite_ankete(id_osobe, id_slanje_ankete, ispunjena) values('" + id_osobe + "', '" + idSlanjeAnkete +   "', '" + false + "') returning id");
+}
 
 module.exports = router;

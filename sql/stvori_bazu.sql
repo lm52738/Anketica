@@ -106,7 +106,7 @@ CREATE TABLE vlastite_ankete
 (
     id               int not null DEFAULT nextval('vlastite_ankete_SEQ'),
     ispunjena        bool         DEFAULT FALSE,
-    id_osobe         int references osobe (id),
+    mail             VARCHAR(64)  DEFAULT NULL,
     id_slanje_ankete int references slanje_ankete (id),
 
     CONSTRAINT vlastite_ankete_pk PRIMARY KEY (id)
@@ -126,9 +126,18 @@ CREATE TABLE odgovori_na_pitanja
 CREATE SEQUENCE moguce_opcije_SEQ INCREMENT BY 1 MINVALUE 0;
 CREATE TABLE moguce_opcije
 (
-    id                     int  not null DEFAULT nextval('moguce_opcije_SEQ'),
-    id_pitanja             int references pitanja (id),
-    tekst                  text not null,
+    id         int  not null DEFAULT nextval('moguce_opcije_SEQ'),
+    id_pitanja int references pitanja (id),
+    tekst      text not null,
 
     CONSTRAINT moguce_opcije_pk PRIMARY KEY (id)
 );
+
+insert into tip_pitanja
+values (0, 'MCQ');
+insert into tip_pitanja
+values (1, 'CHECKBOX');
+insert into tip_pitanja
+values (2, 'FREE_RESPONSE');
+
+
