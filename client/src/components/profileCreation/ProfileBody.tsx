@@ -98,6 +98,7 @@ interface ProfileForm {
   firstName: string;
   lastName: string;
   email: string;
+  birthDay: Date;
   password: string;
   verifyPassword: string;
 }
@@ -131,6 +132,7 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
       firstName: user?.ime,
       lastName: user?.prezime,
       email: user?.mail,
+      birthDay: user?.datum_rod,
       password: user?.password,
       verifyPassword: user?.password
     },
@@ -213,6 +215,15 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
         <Box minW="full">
           <FormLabel>E-mail</FormLabel>
           <Input {...register("email")} type="email" value={user?.mail}/>
+        </Box>
+        <Box minW="full">
+          <FormLabel>Birthday</FormLabel>
+          <Input
+            {...register("birthDay", { valueAsDate: true })}
+            required
+            disabled={isSubmitting}
+            type="date"
+          />
         </Box>
         <Box minW="full">
           <FormLabel>Gender</FormLabel>

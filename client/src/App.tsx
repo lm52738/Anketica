@@ -3,6 +3,7 @@ import Authentification from "pages/Authentification";
 import NewSurvey from "pages/NewSurvey";
 import Surveys from "components/Surveys";
 import ProfilePage from "pages/ProfilePage";
+import Groups from "components/Groups";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
@@ -41,6 +42,9 @@ export const App = () => {
           </Route>
           <Route path="/profile" exact>
             <ProfilePage />
+          </Route>
+          <Route path="/groups" exact>
+            <Groups />
           </Route>
         </Switch>
       </ChakraProvider>
