@@ -16,35 +16,28 @@ import { MdClose } from "react-icons/md";
 import { useHistory } from "react-router";
 import { PrimaryButton, SecondaryButton } from "../shared/Buttons";
 import axios from "axios";
-import { BsFillPersonFill  } from "react-icons/bs";
+import { BsFillPersonFill } from "react-icons/bs";
 
 interface Props {
   switchFormMode: VoidFunction;
 }
 
 interface User {
-  id: number,
-  ime: string,
-  prezime: string,
-  mail: string,
-  datum_rod: Date,
-  rod: string,
-  password: string,
+  id: number;
+  ime: string;
+  prezime: string;
+  mail: string;
+  datum_rod: Date;
+  rod: string;
+  password: string;
 }
 
 export const ProfileView: FC<Props> = ({ switchFormMode }) => {
   var [user, setUser] = useState<User>();
 
   const getUserData = () => {
-    const token = JSON.parse(localStorage.getItem("user")!).token;
-    const headers = {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    };
-
-    axios.get<User>("http://localhost:9000/profile", headers).then((response) => {
-        console.log(response.data);
+    axios.get<User>("http://localhost:9000/profile").then((response) => {
+      console.log(response.data);
       setUser(response.data);
     });
   };
@@ -52,45 +45,40 @@ export const ProfileView: FC<Props> = ({ switchFormMode }) => {
   useEffect(() => getUserData(), []);
 
   return (
-      <>
-        <Flex minW="full">
-          <BsFillPersonFill size = {50}/> 
-          <Text fontSize="3xl" fontWeight="bold">
-              Your profile
-          </Text>
-        </Flex>
-        <VStack
-          as="form"
-          spacing="6"
-          align="start"
-          minW="full"
-        >
-          <Box minW="full">
-              <Text>First name:</Text>
-              <Text>{user?.ime}</Text>
-          </Box>
-          <Box minW="full">
-              <Text>Last name:</Text>
-              <Text> {user?.prezime}</Text>
-          </Box>
-          <Box minW="full">
-              <Text>Email:</Text>
-              <Text>{user?.mail}</Text>
-          </Box>
-          <Box minW="full">
-              <Text>Date of Birth:</Text>
-              <Text>{user?.datum_rod.toString().substring(0,10)}</Text>
-          </Box>
-          <Box minW="full">
-              <Text>Gender:</Text>
-              <Text>{user?.rod}</Text>
-          </Box>
-        </VStack>
-        <Box minW="full">        
-          <SecondaryButton onClick={switchFormMode}>Edit profile</SecondaryButton>
+    <>
+      <Flex minW="full">
+        <BsFillPersonFill size={50} />
+        <Text fontSize="3xl" fontWeight="bold">
+          Your profile
+        </Text>
+      </Flex>
+      <VStack as="form" spacing="6" align="start" minW="full">
+        <Box minW="full">
+          <Text>First name:</Text>
+          <Text>{user?.ime}</Text>
         </Box>
-      </>
-    );
+        <Box minW="full">
+          <Text>Last name:</Text>
+          <Text> {user?.prezime}</Text>
+        </Box>
+        <Box minW="full">
+          <Text>Email:</Text>
+          <Text>{user?.mail}</Text>
+        </Box>
+        <Box minW="full">
+          <Text>Date of Birth:</Text>
+          <Text>{user?.datum_rod.toString().substring(0, 10)}</Text>
+        </Box>
+        <Box minW="full">
+          <Text>Gender:</Text>
+          <Text>{user?.rod}</Text>
+        </Box>
+      </VStack>
+      <Box minW="full">
+        <SecondaryButton onClick={switchFormMode}>Edit profile</SecondaryButton>
+      </Box>
+    </>
+  );
 };
 
 type GenderType = "male" | "female" | "other";
@@ -107,15 +95,8 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
   var [user, setUser] = useState<User>();
 
   const getUserData = () => {
-    const token = JSON.parse(localStorage.getItem("user")!).token;
-    const headers = {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    };
-
-    axios.get<User>("http://localhost:9000/profile", headers).then((response) => {
-        console.log(response.data);
+    axios.get<User>("http://localhost:9000/profile").then((response) => {
+      console.log(response.data);
       setUser(response.data);
     });
   };
@@ -134,19 +115,19 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
       email: user?.mail,
       birthDay: user?.datum_rod,
       password: user?.password,
-      verifyPassword: user?.password
+      verifyPassword: user?.password,
     },
   });
 
   const [gender, setGender] = useState<GenderType>(() => {
-      if (user?.rod === "f"){
-          console.log("u ifu");
-          return "female";
-      } else if (user?.rod === "m") {
-          return "male";
-      } else {
-          return "other";
-      }
+    if (user?.rod === "f") {
+      console.log("u ifu");
+      return "female";
+    } else if (user?.rod === "m") {
+      return "male";
+    } else {
+      return "other";
+    }
   });
 
   const id = user?.id;
@@ -156,7 +137,7 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
     const allData = {
       ...data,
       gender,
-      id
+      id,
     };
 
     const response = await axios.post("http://localhost:9000/profile", allData);
@@ -164,13 +145,12 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
     if (response.data.token) {
       localStorage.setItem("user", JSON.stringify(response.data));
     }
-    
+
     // validation
     push("surveys");
   };
 
   return (
-      
     <>
       <Flex justify="space-between" minW="full">
         <Text fontSize="3xl" fontWeight="bold">
@@ -214,7 +194,7 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
         </HStack>
         <Box minW="full">
           <FormLabel>E-mail</FormLabel>
-          <Input {...register("email")} type="email" value={user?.mail}/>
+          <Input {...register("email")} type="email" value={user?.mail} />
         </Box>
         <Box minW="full">
           <FormLabel>Birthday</FormLabel>

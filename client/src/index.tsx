@@ -5,6 +5,9 @@ import { App } from "./App";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorker from "./serviceWorker";
 
+import axios from "axios";
+import { getUser } from "components/shared/Utils";
+
 ReactDOM.render(
   <React.StrictMode>
     <ColorModeScript />
@@ -12,6 +15,21 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("root")
 );
+
+axios.interceptors.request.use((config) => {
+  const user = getUser();
+
+  if (user) {
+    return {
+      ...config,
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+  } else {
+    return config;
+  }
+});
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -33,6 +33,14 @@ router.get("/", async function (req, res, next) {
   res.sendStatus(200);
 });
 
+router.get("/:id/", async function (req, res, next) {
+  console.log(req.params.id);
+
+  const anketa = await getAnketaByID(5);
+
+  res.json(anketa);
+});
+
 router.post("/", async function (req, res, next) {
   console.log(req.body);
 
@@ -297,8 +305,9 @@ let getAnketaByID = async function (id) {
         `SELECT * from moguce_opcije where id_pitanja = '${questionId}'`
       )
     )["rows"][0];
-    //console.log(question)
+    // console.log(question);
     questionsArray.push({
+      questionId: questionId,
       question: question["tekst"],
       type: question["id_tip_pitanja"],
       possibleAnswers: possibleAnswers["tekst"],
