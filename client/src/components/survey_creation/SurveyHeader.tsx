@@ -59,6 +59,13 @@ const focusedFormDescriptionStyles = {
 interface InputFields {
   title: string;
   description: string;
+  howOften: string;
+  duration: string;
+  recurrances: number;
+  groupName: string;
+  emails: string;
+  emailTitle: string;
+  emailMessage: string;
 }
 
 export const SurveyHeader = () => {
@@ -74,14 +81,19 @@ export const SurveyHeader = () => {
     defaultValues: {
       title: "",
       description: "",
+      howOften: "",
+      duration: "",
+      recurrances: 0,
+      groupName: "",
+      emails: "",
+      emailTitle: "Invitation to survey",
+      emailMessage: "Take my survey!",
     },
   });
 
-  const sendSurvey = handleSubmit(async ({ title, description }) => {
-    // TODO: koliko cesto se ponavlja i koliko traje, ime grupe, mailovi etc.
+  const sendSurvey = handleSubmit(async (data) => {
     const allData = {
-      title,
-      description,
+      ...data,
       questions,
     };
 
@@ -149,6 +161,7 @@ export const SurveyHeader = () => {
           <ModalBody>
             <Grid columnGap="10" rowGap="5" templateColumns="repeat(2, 1fr)">
               {isGroupOpen ? (
+                // TODO dovrisit kada imamo fetchanje grupa
                 <FormControl>
                   <FormLabel>Select existing group</FormLabel>
                   <Select>
@@ -160,11 +173,11 @@ export const SurveyHeader = () => {
                 <>
                   <FormControl>
                     <FormLabel>Group name</FormLabel>
-                    <Input />
+                    <Input {...register("groupName")} />
                   </FormControl>
                   <FormControl>
                     <FormLabel>Emails</FormLabel>
-                    <Input />
+                    <Input {...register("emails")} />
                   </FormControl>
                 </>
               )}
@@ -176,31 +189,34 @@ export const SurveyHeader = () => {
 
             <FormControl>
               <FormLabel>Email title</FormLabel>
-              <Input defaultValue="Invitation to survey" />
+              <Input {...register("emailTitle")} />
             </FormControl>
             <FormControl>
               <FormLabel>Message</FormLabel>
-              <Input defaultValue="Take my survey!" />
+              <Input {...register("emailMessage")} />
             </FormControl>
             <FormControl>
               <FormLabel>How often</FormLabel>
-              <Select>
-                <option>Grupa 1</option>
-                <option>Grupa 2</option>
+              <Select {...register("howOften")}>
+                <option value="0">Every day</option>
+                <option value="1">Every week</option>
+                <option value="2">Every month</option>
+                <option value="3">Every year</option>
               </Select>
             </FormControl>
             <FormControl>
               <FormLabel>Duration</FormLabel>
-              <Select>
-                <option>1 week</option>
-                <option>2 weeks</option>
-                <option>4 weeks</option>
+              <Select {...register("duration")}>
+                <option value="0">1 week</option>
+                <option value="1">2 weeks</option>
+                <option value="2">3 weeks</option>
+                <option value="3">1 month</option>
               </Select>
             </FormControl>
             <FormControl>
               <FormLabel>Recurrances</FormLabel>
               <NumberInput defaultValue={0}>
-                <NumberInputField />
+                <NumberInputField {...register("recurrances")} />
                 <NumberInputStepper>
                   <NumberIncrementStepper />
                   <NumberDecrementStepper />

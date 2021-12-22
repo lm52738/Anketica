@@ -1,11 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require("../db/index.js")
-const bodyParser = require('body-parser');
-
-
-router.use(bodyParser.json({type: 'application/*+json'}))
-
+const db = require("../db/index.js");
+const bodyParser = require("body-parser");
+const nodemailer = require("nodemailer");
+const schedule = require("node-schedule");
+router.use(bodyParser.json({ type: "application/*+json" }));
 
 /*
 U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
@@ -30,150 +29,289 @@ U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
 
 */
 
+router.get("/", async function (req, res, next) {
+  res.sendStatus(200);
+});
 
-router.get('/',
-    async function (req, res, next) {
-        res.sendStatus(200)
+router.post("/", async function (req, res, next) {
+  console.log(req.body);
+
+  let {
+    groupName,
+    title,
+    description,
+    howOften,
+    duration,
+    recurrances,
+    emailTitle,
+    emailMessage,
+    emails,
+    questions,
+  } = req.body;
+
+  const now = Date.now();
+
+  const mails = emails.split(",").map((mail) => mail.trim());
+
+  if (howOften != null && recurrances > 0) {
+    // primjeri https://crontab.tech/examples
+    const job = schedule.scheduleJob(
+      {
+        start: now,
+        end: endDate(howOften, recurrances),
+        rule: jobRule(howOften),
+      },
+      () => {
+        //TODO link na anketu
+        sendMails(mails, emailTitle, emailMessage, "link na anketu");
+      }
+    );
+  }
+
+  // console.log("~~~~~~~~~~~")
+  // console.log(req.body)
+  // console.log("~~~~~~~~~~~")
+  // console.log(creator, title, description)
+  // console.log(questions)
+  //
+  // let numberOfTimesAsked = 3 // pitana 3 puta dodatno uz ovaj
+  // let timePeriod = 7 // 7 dana po anketi
+  // let mails = emails.split(", ");
+  //
+  // let idAnkete = (await createAnketa(title))['rows'][0]['id']
+  // console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
+  // for (const questionIter of questions) {
+  //     console.log("~~~~~~~~~~~~~~~~~~~~~~")
+  //     let {mode, question, answers} = questionIter;
+  //
+  //     let questionID = (await createQuestion(question, questionTypeStringToInt(mode), idAnkete))['rows'][0]['id']
+  //     console.log("STVOREN ENTRY PITANJE, ID: " + questionID)
+  //
+  //     console.log("MOGUCE OPCIJE SU: " + answers)
+  //     let answersID = (await createAnswers(questionID, answers))['rows'][0]['id']
+  //     console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + answersID)
+  // }
+  //
+  //
+  // let today = new Date();
+  // let sentPollsIds = []
+  // for (let i = 0; i < numberOfTimesAsked + 1; i++) {
+  //     let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+  //
+  //     let slanjeId = (await createSlanjeAnkete(idAnkete, date, timePeriod))['rows'][0]['id']
+  //     sentPollsIds.push(slanjeId)
+  //     addDays(date, 7)
+  // }
+  //
+  // for (const sendPollsId of sentPollsIds) {
+  //     for (const mail of mails) {
+  //         let vlastitaId = (await createVlasitaAnketa(sendPollsId, mail))['rows'][0]['id']
+  //         //console.log("Created vlastita anketa, id: " + vlastitaId)
+  //     }
+  //
+  // }
+  //
+  // let anketeZahh = (await getVlastiteAnketeByMail("h.h@gmail.com"))['rows']
+  //
+  // console.log(anketeZahh)
+
+  await getAnketaByID(5);
+
+  res.sendStatus(200);
+});
+
+// mozda ubuduce budemo imali startdate pa cemo iz toga dobiti i vrijeme u koliko sati da se obavi
+const jobRule = (howOften) => {
+  const now = Date.now();
+
+  switch (howOften) {
+    // every day at current time
+    case 0:
+      // return `${now.getMinutes()} ${now.getHours()} * * *`;
+
+      // za demonstraciju svake minute, inace koristiti ovo iznad
+      return `*/1 ${now.getHours()} * * *`;
+    // every week at current time
+    case 1:
+      return `${now.getMinutes()} ${now.getHours()} * * ${now.getDay()}`;
+    // every month at current time
+    case 2:
+      return `${now.getMinutes()} ${now.getHours()} * */1 *}`;
+    // every year at current time
+    case 3:
+      return `${now.getMinutes()} ${now.getHours()} * ${now.getMonth()} *`;
+    // ako nema rulea jednostavno nije periodicna anketa
+    default:
+      break;
+  }
+};
+
+const endDate = (howOften, recurrances) => {
+  const now = Date.now();
+
+  switch (howOften) {
+    case 0:
+      return addDays(now, recurrances);
+    case 1:
+      return addDays(now, recurrances * 7);
+    case 2:
+      return addMonth(now);
+    case 3:
+      return addYear(now);
+    default:
+      break;
+  }
+};
+
+function sendMails(emails, title, text, link) {
+  let mailTransporter = nodemailer.createTransport({
+    host: "smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: "09a4eb7b175d33",
+      pass: process.env.MAIL_PASSWORD,
+    },
+  });
+
+  emails.forEach((email) => {
+    let mailDetails = {
+      from: "anketica.noreply@gmail.com",
+      to: email,
+      subject: title,
+      text: `${text}\n\n${link}`,
+    };
+
+    // Sending Email
+    mailTransporter.sendMail(mailDetails, function (err, data) {
+      if (err) {
+        console.log("Error Occurs", err);
+      } else {
+        console.log(`Email sent successfully to ${email}`);
+      }
     });
+  });
+}
 
-router.post('/',
-    async function (req, res, next) {
+function addMonth(date) {
+  const result = new Date(date);
+  result.setMonth(date.getMonth() + months);
+  return result;
+}
 
-
-        // console.log("tu sam")
-        // let {creator, title, description, questions} = req.body;
-        // console.log("~~~~~~~~~~~")
-        // console.log(req.body)
-        // console.log("~~~~~~~~~~~")
-        // console.log(creator, title, description)
-        // console.log(questions)
-        //
-        // let numberOfTimesAsked = 3 // pitana 3 puta dodatno uz ovaj
-        // let timePeriod = 7 // 7 dana po anketi
-        // let mails = ["h.h@gmail.com", "hrvoje.hemen@gmail.com", "bla.bla@gmail.com"]
-        //
-        // let idAnkete = (await createAnketa(title))['rows'][0]['id']
-        // console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
-        // for (const questionIter of questions) {
-        //     console.log("~~~~~~~~~~~~~~~~~~~~~~")
-        //     let {mode, question, answers} = questionIter;
-        //
-        //     let questionID = (await createQuestion(question, questionTypeStringToInt(mode), idAnkete))['rows'][0]['id']
-        //     console.log("STVOREN ENTRY PITANJE, ID: " + questionID)
-        //
-        //     console.log("MOGUCE OPCIJE SU: " + answers)
-        //     let answersID = (await createAnswers(questionID, answers))['rows'][0]['id']
-        //     console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + answersID)
-        // }
-        //
-        //
-        // let today = new Date();
-        // let sentPollsIds = []
-        // for (let i = 0; i < numberOfTimesAsked + 1; i++) {
-        //     let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        //
-        //     let slanjeId = (await createSlanjeAnkete(idAnkete, date, timePeriod))['rows'][0]['id']
-        //     sentPollsIds.push(slanjeId)
-        //     addDays(date, 7)
-        // }
-        //
-        // for (const sendPollsId of sentPollsIds) {
-        //     for (const mail of mails) {
-        //         let vlastitaId = (await createVlasitaAnketa(sendPollsId, mail))['rows'][0]['id']
-        //         //console.log("Created vlastita anketa, id: " + vlastitaId)
-        //     }
-        //
-        // }
-        //
-        // let anketeZahh = (await getVlastiteAnketeByMail("h.h@gmail.com"))['rows']
-        //
-        // console.log(anketeZahh)
-
-
-        await getAnketaByID(5)
-
-
-        res.sendStatus(200)
-    });
+function addYear(date) {
+  const aYearFromNow = new Date(date);
+  aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
+  return aYearFromNow;
+}
 
 function addDays(date, days) {
-    const result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
 }
 
 let questionTypeStringToInt = function (stringVal) {
-    switch (stringVal) {
-        case "radio":
-            return 0;
-        case "text":
-            return 1;
-        case "checkbox" :
-            return 2;
-        default:
-            return -1;
-    }
-}
+  switch (stringVal) {
+    case "radio":
+      return 0;
+    case "text":
+      return 1;
+    case "checkbox":
+      return 2;
+    default:
+      return -1;
+  }
+};
 
 //TODO promijeniti sve queryje da koriste `` umjesto "" radi lijepseg formatiranja
 let createAnketa = async function (imeAnkete) {
-    return db.query("INSERT INTO ankete(ime) values('" + imeAnkete + "') returning id");
-}
+  return db.query(
+    "INSERT INTO ankete(ime) values('" + imeAnkete + "') returning id"
+  );
+};
 let createQuestion = async function (tekstPitanja, idTipaPitanja, idAnkete) {
-    return db.query("INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete) values('" + tekstPitanja + "', '" + idTipaPitanja + "', '" + idAnkete + "') returning id");
-}
+  return db.query(
+    "INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete) values('" +
+      tekstPitanja +
+      "', '" +
+      idTipaPitanja +
+      "', '" +
+      idAnkete +
+      "') returning id"
+  );
+};
 
 let createAnswers = async function (idPitanja, moguceOpcijeTekst) {
-    return db.query("INSERT INTO moguce_opcije(id_pitanja, tekst) values('" + idPitanja + "', '" + moguceOpcijeTekst + "') returning id");
-}
+  return db.query(
+    "INSERT INTO moguce_opcije(id_pitanja, tekst) values('" +
+      idPitanja +
+      "', '" +
+      moguceOpcijeTekst +
+      "') returning id"
+  );
+};
 
 let createSlanjeAnkete = async function (idAnkete, datum, trajanje) {
-    return db.query("INSERT INTO slanje_ankete(id_ankete, datum, trajanje) values('" + idAnkete + "', '" + datum + "', '" + trajanje + "') returning id");
-}
+  return db.query(
+    "INSERT INTO slanje_ankete(id_ankete, datum, trajanje) values('" +
+      idAnkete +
+      "', '" +
+      datum +
+      "', '" +
+      trajanje +
+      "') returning id"
+  );
+};
 
 let createVlasitaAnketa = async function (idSlanjeAnkete, mail_osobe) {
-    return db.query(`INSERT INTO vlastite_ankete(mail, id_slanje_ankete, ispunjena)
+  return db.query(`INSERT INTO vlastite_ankete(mail, id_slanje_ankete, ispunjena)
                      values ('${mail_osobe}', '${idSlanjeAnkete}', false)
                      returning id`);
-}
+};
 
 let getVlastiteAnketeByMail = async function (mail_osobe) {
-    return db.query(`SELECT *
+  return db.query(`SELECT *
                      from vlastite_ankete
                      where mail = '${mail_osobe}'`);
-}
+};
 let getAnketaByID = async function (id) {
-    let anketaIzBaze = (await (db.query(`SELECT *
+  let anketaIzBaze = (
+    await db.query(`SELECT *
                                from ankete
-                               where id = '${id}'`)))['rows'][0]
-    console.log(anketaIzBaze)
+                               where id = '${id}'`)
+  )["rows"][0];
+  console.log(anketaIzBaze);
 
-    let ime = anketaIzBaze['ime']
+  let ime = anketaIzBaze["ime"];
 
-    let questions = (await (db.query(`SELECT * from pitanja where id_ankete = '${id}'`)))['rows']
+  let questions = (
+    await db.query(`SELECT * from pitanja where id_ankete = '${id}'`)
+  )["rows"];
 
-    let questionsArray = []
-    for (const question of questions) {
+  let questionsArray = [];
+  for (const question of questions) {
+    let questionId = question["id"];
 
-        let questionId = question['id']
+    let possibleAnswers = (
+      await db.query(
+        `SELECT * from moguce_opcije where id_pitanja = '${questionId}'`
+      )
+    )["rows"][0];
+    //console.log(question)
+    questionsArray.push({
+      question: question["tekst"],
+      type: question["id_tip_pitanja"],
+      possibleAnswers: possibleAnswers["tekst"],
+    });
+  }
 
-        let possibleAnswers = (await (db.query(`SELECT * from moguce_opcije where id_pitanja = '${questionId}'`)))['rows'][0]
-        //console.log(question)
-        questionsArray.push({
-            "question" : question['tekst'],
-            "type": question['id_tip_pitanja'],
-            "possibleAnswers" : possibleAnswers['tekst']
-        })
-    }
-
-
-    let anketa = {
-        "id": id,
-        "name": ime,
-        "questions": questionsArray
-    }
-    console.log(anketa)
-    return anketa
-}
+  let anketa = {
+    id: id,
+    name: ime,
+    questions: questionsArray,
+  };
+  console.log(anketa);
+  return anketa;
+};
 
 module.exports = router;
