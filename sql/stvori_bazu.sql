@@ -97,6 +97,7 @@ CREATE TABLE pitanja
     tekst          text not null,
     id_tip_pitanja int references tip_pitanja (id),
     id_ankete      int references ankete (id),
+    required       bool          DEFAULT FALSE,
 
     CONSTRAINT pitanja_pk PRIMARY KEY (id)
 );
