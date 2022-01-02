@@ -7,6 +7,7 @@ import Groups from "components/Groups";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import SurveyPage from "pages/SurveyPage";
+import { AddGroup } from "components/AddGroup";
 
 const theme = extendTheme({
   colors: {
@@ -49,6 +50,9 @@ export const App = () => {
           </Route>
           <Route path="/groups" exact>
             <Groups />
+          </Route>
+          <Route path="/addGroup" exact>
+            <AddGroup />
           </Route>
         </Switch>
       </ChakraProvider>

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { DataGrid, GridApi, GridCellEditCommitParams, GridCellValue, GridColDef, GridValueGetterParams } from '@material-ui/data-grid';
 import { GroupsHeader } from './GroupsHeader';
-import { GroupsInput } from './GroupsInput';
 import axios from "axios";
 import { FC, useState, useEffect } from "react";
 import { isEmpty } from '@chakra-ui/utils';
@@ -124,13 +123,17 @@ export default function DataTable() {
 
   }
 
+
   return (
     <div>
     <GroupsHeader />
       <div style={{ height: '80%', width: '90%', position: 'absolute', left: '5%', right: '5%', background: '#FFFFFF'}}>
-        <div style={{ alignItems: 'center', margin: '30px', padding: '10px', border: '1px solid #D3D3D3'}}>
-          <GroupsInput />  
+        <div style={{ alignItems: 'center', margin: '30px'}}>
+            <a href="/addGroup">
+              <Button> Add new group</Button>
+            </a>
         </div>
+        
         <DataGrid
           rows={rows}
           columns={columns}
