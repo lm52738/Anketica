@@ -19,6 +19,7 @@ const anketaRouter = require('./routes/anketa');
 const profileRouter = require('./routes/profile');
 const surveysRouter = require('./routes/surveys');
 const groupsRouter = require('./routes/groups');
+const addGroupRouter = require('./routes/addGroup');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use("/anketa", anketaRouter);
 app.use("/profile",profileRouter);
 app.use("/surveys",surveysRouter);
 app.use("/groups",groupsRouter);
+app.use("/addGroup",addGroupRouter);
 
 
 // catch 404 and forward to error handler

@@ -1,48 +1,146 @@
 import * as React from 'react';
-import { DataGrid, GridColDef, GridValueGetterParams } from '@material-ui/data-grid';
-import { background } from '@chakra-ui/styled-system';
+import { DataGrid, GridApi, GridCellEditCommitParams, GridCellValue, GridColDef, GridValueGetterParams } from '@material-ui/data-grid';
 import { GroupsHeader } from './GroupsHeader';
+import axios from "axios";
+import { FC, useState, useEffect } from "react";
+import { isEmpty } from '@chakra-ui/utils';
+import { Button } from "@chakra-ui/react";
 
+interface group {
+  id: number;
+  ime: string;
+  mail: string;
+}
 
 const columns: GridColDef[] = [
-  //{ field: 'nameOfSurvay', headerName: 'nameOfSurvay', width: 90 },
   {
-    field: 'name',
+    field: 'id',
+    headerName: 'ID',
+    width: 100,
+    align: 'center'
+  },
+  {
+    field: 'ime',
     headerName: 'Name',
     width: 150,
-    align: 'left',
+    align: 'center',
+    editable: true
   },
   {
-    field: 'created',
-    headerName: 'Created',
-    width: 150,
-    align: 'right',
-    headerAlign: 'right',
+    field: 'mail',
+    headerName: 'Mails',
+    width: 750,
+    align: 'left',
+    editable: true
   },
+  {
+    field: "action",
+    headerName: " ",
+    
+    sortable: false,
+    renderCell: (params) => {
+      const onClick = async (e) => {
+        e.stopPropagation(); // don't select this row after clicking
+
+        const api: GridApi = params.api;
+        const thisRow: Record<string, GridCellValue> = {};
+
+        api
+          .getAllColumns()
+          .filter((c) => c.field !== "__check__" && !!c)
+          .forEach(
+            (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
+          );
+
+        window.location.reload();
+
+        console.log(thisRow);
+        const url = "http://localhost:9000/groups/" + thisRow.id;
+        await axios.post(url, thisRow);
+
+      };
+
+      return <Button onClick={onClick}>Delete</Button>;
+    }
+  }
   
 ];
 
-const rows = [
-  {id: 1, name: 'Grupa 1', created: '21.11.2021.' },
-  {id: 2, name: 'Grupa 2', created: '22.05.2021.' },
-  {id: 3, name: 'Grupa 3', created: '10.10.2021.' },
-  {id: 4, name: 'Grupa 4', created: '02.12.2021.' },
-  {id: 5, name: 'Grupa 5', created: '15.01.2021.' },
-];
 
 export default function DataTable() {
+  var [group, setGroup] = useState<group>();
+  let groups = Array<group>();
+  const [rows, setRows] = useState<group[]>([]);
+
+  //dohvat grupa
+  const getUserData = () => {
+    axios.get("http://localhost:9000/groups").then((response) => {
+      console.log(response.data);
+      for (group of response.data) {
+        if (group){
+          let id = group.id;
+          let oldGroup = groups.find(g => g.id == id);
+          if (oldGroup){
+            console.log("grupa je unesena");
+
+            let mail = oldGroup.mail.concat(", " + group.mail);
+            group.mail = mail;
+
+            setGroup(group);
+            groups.pop();
+          } else {
+            setGroup(group);
+          }
+          groups.push(group);
+        }
+      }
+
+      if (!isEmpty(groups)){
+        setRows(groups);
+      }
+
+    });
+
+  };
+
+  // treba dohvatit
+  useEffect(() => getUserData(), []);
+
+  // edit data
+  const handleCommit = async (e:GridCellEditCommitParams) => {
+    const array = rows.map( r => {
+      if (r.id === e.id)
+        return {...r, [e.field]:e.value}
+      else
+        return {...r}
+    })
+    // postavi rows
+    setRows(array);
+
+    //posalji na groups/post
+    console.log(array);
+    await axios.post("http://localhost:9000/groups", array);
+
+  }
+
+
   return (
-     <div>
-     <GroupsHeader />
-    <div style={{ height: '80%', width: '90%', position: 'absolute', left: '5%', right: '5%', background: '#FFFFFF'}}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={5}
-        //checkboxSelection
-        //disableSelectionOnClick
-      />
-    </div>
+    <div>
+    <GroupsHeader />
+      <div style={{ height: '80%', width: '90%', position: 'absolute', left: '5%', right: '5%', background: '#FFFFFF'}}>
+        <div style={{ alignItems: 'center', margin: '30px'}}>
+            <a href="/addGroup">
+              <Button> Add new group</Button>
+            </a>
+        </div>
+        
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={10}
+          onCellEditCommit={handleCommit}
+        />
+      </div>
     </div>
   );
 }
