@@ -6,6 +6,8 @@ const nodemailer = require("nodemailer");
 const schedule = require("node-schedule");
 router.use(bodyParser.json({type: "application/*+json"}));
 
+
+const add = require('date-fns/add')
 /*
 U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
 
@@ -83,10 +85,23 @@ router.post("/", async function (req, res, next) {
         duration = 1
     }
     let timePeriod = duration * 7
-
     // ako nije specificirano anketa se pita jednom tjedno
     if (howOften == null) {
         howOften = 7
+    }
+    else{
+        if(howOften === "0"){
+            howOften = 1
+        }
+        else if(howOften === "1"){
+            howOften = 7
+        }
+        else if(howOften === "2"){
+            howOften = 30
+        }
+        else{
+            howOften = 365
+        }
     }
     //ako nije specificirano anketa se ne pita dodatno, samo jedan originalni put
     if (recurrances == null) {
@@ -129,7 +144,8 @@ router.post("/", async function (req, res, next) {
         let slanjeId = (await createSlanjeAnkete(idAnkete, date, timePeriod))['rows'][0]['id']
         sentPollsIds.push(slanjeId)
 
-        today = addDays(today, howOften)
+        today = add(today, {days:howOften})
+        console.log(today)
     }
 
     for (const sendPollsId of sentPollsIds) {
@@ -180,13 +196,13 @@ const endDate = (howOften, recurrences) => {
 
     switch (howOften) {
         case 0:
-            return addDays(now, recurrences);
+            return add(now, {days: recurrences});
         case 1:
-            return addDays(now, recurrences * 7);
+            return add(now, {days: recurrences * 7});
         case 2:
-            return addMonth(now);
+            return add(now, {months: 1});
         case 3:
-            return addYear(now);
+            return add(now, {years: 1});
         default:
             break;
     }
@@ -221,23 +237,7 @@ function sendMails(emails, title, text, link) {
     });
 }
 
-function addMonth(date) {
-    const result = new Date(date);
-    result.setMonth(date.getMonth() + months);
-    return result;
-}
 
-function addYear(date) {
-    const aYearFromNow = new Date(date);
-    aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
-    return aYearFromNow;
-}
-
-function addDays(date, days) {
-    const result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
-}
 
 let questionTypeStringToInt = function (stringVal) {
     switch (stringVal) {
