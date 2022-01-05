@@ -252,6 +252,8 @@ let questionTypeStringToInt = function (stringVal) {
     }
 };
 
+
+
 //TODO promijeniti sve queryje da koriste `` umjesto "" radi lijepseg formatiranja
 let createAnketa = async function (imeAnkete) {
     return db.query(
