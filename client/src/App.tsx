@@ -3,11 +3,11 @@ import Authentification from "pages/Authentification";
 import NewSurvey from "pages/NewSurvey";
 import Surveys from "components/Surveys";
 import ProfilePage from "pages/ProfilePage";
-import Groups from "components/Groups";
+import Groups from "components/groupCreation/Groups";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import SurveyPage from "pages/SurveyPage";
-import { AddGroup } from "components/AddGroup";
+import { AddGroup } from "components/groupCreation/AddGroup";
 
 const theme = extendTheme({
   colors: {

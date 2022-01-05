@@ -6,11 +6,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import { GroupsHeader } from './GroupsHeader';
 import { isEmpty, valuesIn } from "lodash";
-import { PrimaryButton } from "./shared/Buttons";
+import { PrimaryButton } from "../shared/Buttons";
+import { GroupImage } from "./GroupImage";
 
 interface GroupFormFields {
     ime: string;
-    mails: Array<string>;
   }
 
 interface mail {
@@ -18,12 +18,12 @@ interface mail {
 }
 
 export const AddGroup = () => {
+    const { push } = useHistory();
 
     var [mail, setMail] = useState<mail>();
     let mails = Array<string>();
     const [rows, setRows] = useState<string[]>([]);
     let newMails = Array<string>();
-    const [data, setData] = useState<FormData>();
 
     const {
         register,
@@ -32,7 +32,6 @@ export const AddGroup = () => {
     } = useForm<GroupFormFields>({
         defaultValues: {
         ime: "",
-        mails: [],
         },
     });
 
@@ -59,10 +58,15 @@ export const AddGroup = () => {
 
     const input: SubmitHandler<GroupFormFields> = async (data) => {
 
-        console.log(data);
+        const allData = {
+            ...data,
+            newMails,
+          };
+        console.log(allData);
 
-        //window.location.reload();
-        //await axios.post("http://localhost:9000/addGroup", data);
+        await axios.post("http://localhost:9000/addGroup", allData);
+
+        push("/groups");
     
     };
 
@@ -78,13 +82,12 @@ export const AddGroup = () => {
         <div>
         <GroupsHeader />
         <VStack
-        align="start" minW={{base: "100vw",md: "1000px",}}
-        w="full" maxW={{ base: "100vw",  md: "400px", }}
+        align="start" minW={{base: "100vw",md: "400px",}}
+        w="full" maxW={{ base: "100vw",  md: "1000px", }}
         minH={{base: "100vh", md: "400px", }}
         h="full" maxH={{ base: "100vh", md: "650px", }}
         bg="white" boxShadow={{ base: "none", md: "lg", }}
         borderRadius={{ base: "none", md: "lg", }}
-        marginTop={{ md:"50px" }} 
         mx="auto" p="6" spacing="6"
         onSubmit={handleSubmit(input)} >
         <>
@@ -93,8 +96,9 @@ export const AddGroup = () => {
                 Add new group
                 </Text>
             </Flex>
-            <HStack as="form" spacing="200" align="start" minW="full" >
-                <VStack>
+            <HStack as="form" spacing="90" align="start" minW="full" >
+                <VStack spacing="6" height={{base: "100vw",  md: "400px",}} 
+                width={{base: "100vw",md: "500px", }} >
                 <Box>
                     <FormLabel>Name of group</FormLabel>
                     <Input
@@ -104,7 +108,19 @@ export const AddGroup = () => {
                     type="text"
                     />
                 </Box>
-                
+
+                <Box
+                display={{
+                    base: "none",
+                    lg: "flex",
+                }}
+                align="center"
+                justify="center"
+                direction="column"
+                >
+                    <GroupImage/>
+                </Box>
+
                 <PrimaryButton
                     type="submit"
                     isLoading={isSubmitting}
@@ -114,8 +130,8 @@ export const AddGroup = () => {
                 </PrimaryButton>
                 </VStack>
                 
-                <VStack spacing="6" style={{ overflowY: "scroll" }} height={{base: "100vw",  md: "400px",}} 
-                width={{base: "100vw",md: "400px", }} 
+                <VStack spacing="4" style={{ overflowY: "scroll" }} height={{base: "100vw",  md: "400px",}} 
+                width={{base: "100vw",md: "350px", }} 
                 >
 
                     {rows.map(mail => (
