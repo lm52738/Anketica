@@ -8,6 +8,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import SurveyPage from "pages/SurveyPage";
 import { AddGroup } from "components/groupCreation/AddGroup";
+import Chart from "components/statistics/Chart";
 
 const theme = extendTheme({
   colors: {
@@ -53,6 +54,9 @@ export const App = () => {
           </Route>
           <Route path="/addGroup" exact>
             <AddGroup />
+          </Route>
+          <Route path="/statistics/:id" exact>
+            <Chart />
           </Route>
         </Switch>
       </ChakraProvider>

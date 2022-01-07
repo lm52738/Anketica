@@ -1,10 +1,7 @@
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import Button from '@mui/material/Button';
+import { extendTheme } from "@chakra-ui/react";
 import React from "react";
-import { FaBeer } from "@react-icons/all-files/fa/FaBeer";
 import { BsFillPersonFill  } from "react-icons/bs";
-import { Box, Text, Heading, Flex } from "@chakra-ui/react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Text, Flex } from "@chakra-ui/react";
 
 const theme = extendTheme({
   colors: {

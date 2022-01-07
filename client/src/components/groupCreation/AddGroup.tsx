@@ -8,22 +8,25 @@ import { GroupsHeader } from './GroupsHeader';
 import { isEmpty, valuesIn } from "lodash";
 import { PrimaryButton } from "../shared/Buttons";
 import { GroupImage } from "./GroupImage";
+import { BsFillPersonFill  } from "react-icons/bs";
 
 interface GroupFormFields {
     ime: string;
   }
 
-interface mail {
+interface User {
+    ime: string
+    prezime: string;
     mail: string;
 }
 
 export const AddGroup = () => {
     const { push } = useHistory();
 
-    var [mail, setMail] = useState<mail>();
+    var [user, setUser] = useState<User>();
+    let users = Array<User>();
+    const [rows, setRows] = useState<User[]>([]);
     let mails = Array<string>();
-    const [rows, setRows] = useState<string[]>([]);
-    let newMails = Array<string>();
 
     const {
         register,
@@ -40,16 +43,10 @@ export const AddGroup = () => {
         axios.get("http://localhost:9000/addGroup").then((response) => {
         console.log(response.data);
         
-        for (mail of response.data){
-            if (mail)
-                mails.push(mail?.mail);
-        }
-    
-        console.log(mails)
+        setRows(response.data);
 
-        if (!isEmpty(mails))
-            setRows(mails);
         });
+        
     };
 
     // treba dohvatit
@@ -60,7 +57,7 @@ export const AddGroup = () => {
 
         const allData = {
             ...data,
-            newMails,
+            mails,
           };
         console.log(allData);
 
@@ -73,8 +70,8 @@ export const AddGroup = () => {
     const handleCheckBox = (event) => {
         console.log(event.target.value);
         
-        newMails.push(event.target.value);
-        console.log(newMails);
+        mails.push(event.target.value);
+        console.log(mails);
 
     }
 
@@ -96,20 +93,21 @@ export const AddGroup = () => {
                 Add new group
                 </Text>
             </Flex>
-            <HStack as="form" spacing="90" align="start" minW="full" >
+            <HStack as="form" spacing="150" align="start" minW="full" >
                 <VStack spacing="6" height={{base: "100vw",  md: "400px",}} 
                 width={{base: "100vw",md: "500px", }} >
-                <Box>
+                <Flex width="100%" align="center" justify="center">
                     <FormLabel>Name of group</FormLabel>
                     <Input
+                    width="50%"
                     required
                     {...register("ime")}
                     disabled={isSubmitting}
                     type="text"
-                    />
-                </Box>
+                    />                    
+                </Flex>
 
-                <Box
+                <Flex
                 display={{
                     base: "none",
                     lg: "flex",
@@ -119,7 +117,7 @@ export const AddGroup = () => {
                 direction="column"
                 >
                     <GroupImage/>
-                </Box>
+                </Flex>
 
                 <PrimaryButton
                     type="submit"
@@ -130,12 +128,19 @@ export const AddGroup = () => {
                 </PrimaryButton>
                 </VStack>
                 
-                <VStack spacing="4" style={{ overflowY: "scroll" }} height={{base: "100vw",  md: "400px",}} 
-                width={{base: "100vw",md: "350px", }} 
+                <VStack spacing="6" style={{ overflowY: "scroll" }} height={{base: "100vw",  md: "400px",}} 
+                width={{base: "100vw",md: "250px", }} alignItems="left"
                 >
 
-                    {rows.map(mail => (
-                        <div><input onChange={handleCheckBox} type="checkbox" name={mail} value={mail} /> {mail}</div>
+                    {rows.map(user => (
+                        <Flex align="center">
+                            <input onChange={handleCheckBox} type="checkbox" name={user?.mail} value={user?.mail} />
+                            <div  style={{ paddingLeft:"3%", paddingRight:"3%"}}>
+                               <BsFillPersonFill size = {20}/> 
+                            </div>
+                            
+                            <Text> {user?.ime} {user?.prezime}</Text>
+                        </Flex>
                     ))}                
                 
                 </VStack>

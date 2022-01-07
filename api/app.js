@@ -20,6 +20,7 @@ const profileRouter = require('./routes/profile');
 const surveysRouter = require('./routes/surveys');
 const groupsRouter = require('./routes/groups');
 const addGroupRouter = require('./routes/addGroup');
+const statisticsRouter = require('./routes/statistics');
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use("/profile",profileRouter);
 app.use("/surveys",surveysRouter);
 app.use("/groups",groupsRouter);
 app.use("/addGroup",addGroupRouter);
+app.use("/statistics",statisticsRouter);
 
 
 // catch 404 and forward to error handler

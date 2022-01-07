@@ -5,7 +5,6 @@ import axios from "axios";
 import { FC, useState, useEffect } from "react";
 import { isEmpty } from '@chakra-ui/utils';
 import { Button, Flex } from "@chakra-ui/react";
-import { AddNewImage } from './AddNewImage';
 
 interface group {
   id: number;
@@ -138,7 +137,7 @@ export default function DataTable() {
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={10}
+          pageSize={5}
           onCellEditCommit={handleCommit}
         />
       </div>
