@@ -88,18 +88,14 @@ router.post("/", async function (req, res, next) {
     // ako nije specificirano anketa se pita jednom tjedno
     if (howOften == null) {
         howOften = 7
-    }
-    else{
-        if(howOften === "0"){
+    } else {
+        if (howOften === "0") {
             howOften = 1
-        }
-        else if(howOften === "1"){
+        } else if (howOften === "1") {
             howOften = 7
-        }
-        else if(howOften === "2"){
+        } else if (howOften === "2") {
             howOften = 30
-        }
-        else{
+        } else {
             howOften = 365
         }
     }
@@ -144,7 +140,7 @@ router.post("/", async function (req, res, next) {
         let slanjeId = (await createSlanjeAnkete(idAnkete, date, timePeriod))['rows'][0]['id']
         sentPollsIds.push(slanjeId)
 
-        today = add(today, {days:howOften})
+        today = add(today, {days: howOften})
         console.log(today)
     }
 
@@ -238,7 +234,6 @@ function sendMails(emails, title, text, link) {
 }
 
 
-
 let questionTypeStringToInt = function (stringVal) {
     switch (stringVal) {
         case "radio":
@@ -253,44 +248,32 @@ let questionTypeStringToInt = function (stringVal) {
 };
 
 
-
-//TODO promijeniti sve queryje da koriste `` umjesto "" radi lijepseg formatiranja
 let createAnketa = async function (imeAnkete) {
     return db.query(
-        "INSERT INTO ankete(ime) values('" + imeAnkete + "') returning id"
+        `INSERT INTO ankete(ime) values('${imeAnkete}') returning id`
     );
 };
 let createQuestion = async function (tekstPitanja, idTipaPitanja, idAnkete) {
     return db.query(
-        "INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete) values('" +
-        tekstPitanja +
-        "', '" +
-        idTipaPitanja +
-        "', '" +
-        idAnkete +
-        "') returning id"
+        `INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete)
+         values ('${tekstPitanja}', '${idTipaPitanja}', '${idAnkete}')
+         returning id`
     );
 };
 
 let createAnswers = async function (idPitanja, moguceOpcijeTekst) {
     return db.query(
-        "INSERT INTO moguce_opcije(id_pitanja, tekst) values('" +
-        idPitanja +
-        "', '" +
-        moguceOpcijeTekst +
-        "') returning id"
+        `INSERT INTO moguce_opcije(id_pitanja, tekst)
+         values ('${idPitanja}', '${moguceOpcijeTekst}')
+         returning id`
     );
 };
 
 let createSlanjeAnkete = async function (idAnkete, datum, trajanje) {
     return db.query(
-        "INSERT INTO slanje_ankete(id_ankete, datum, trajanje) values('" +
-        idAnkete +
-        "', '" +
-        datum +
-        "', '" +
-        trajanje +
-        "') returning id"
+        `INSERT INTO slanje_ankete(id_ankete, datum, trajanje)
+         values ('${idAnkete}', '${datum}', '${trajanje}')
+         returning id`
     );
 };
 
