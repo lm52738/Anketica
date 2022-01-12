@@ -8,16 +8,57 @@ router.use(bodyParser.json({type: "application/*+json"}));
 
 
 const add = require('date-fns/add')
+/*
+U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
 
+{
+    "creator": "userId", // ovo nam basically isto ne treba u requestu jer ces preko bearer tokena moc saznat koji je user poslao, tako da ja bi idealno samo token slao u headeru umjesto ovoga
+    "title": "test anketa",
+    "description": "JAKO SUPER ANKETA KOJA JE SUPAC SUPAC SUP",
+    "questions": [{
+            "mode": "radio", // (ili "text" ili "checkbox"), mozemo i s brojevima ako zelis, svejedno
+            "question": "u koliko sati se dizes ujutro ~ tip 0 je jedan tocan odg",
+            "answers": ["8", "9", "10"],   // za text saljem praznu listu valjda, nije ni bitno
+            "isRequired": true   //novo
+        }
+    ],
+    // sve dalje je isto novo
+    "groupName": "Ime grupe",
+    "emails": ["hrvoje@hotmails.com", "example@gmail.com"],
+    "emailTitle": "Header poruke",
+    "emailMessage": "Pocetni tekst poruke" //nakon kojeg dode i link na anketu ili nes
+}
+
+*/
 
 router.get("/", async function (req, res, next) {
     res.sendStatus(200);
 });
 
-router.get("/:id/", async function (req, res, next) {
-    console.log(req.params.id);
+router.get("/id/:id/", async function (req, res, next) {
+    console.log("Gettam po id-ju" + req.params.id)
     const anketa = await getAnketaByID(req.params.id);
+
     res.json(anketa);
+});
+
+router.get("/vlastita/:id/", async function (req, res, next) {
+    console.log("Gettam vlastitu  id-ju" + req.params.id)
+    const anketa = await getVlastitaAnketaByID(req.params.id);
+
+    res.json(anketa['rows']);
+});
+router.get("/slanje/:id/", async function (req, res, next) {
+    console.log("Gettam slanje  id-ju" + req.params.id)
+    const anketa = await getSlanjeAnketeByID(req.params.id);
+
+    res.json(anketa['rows']);
+});
+
+router.get("/mail/:mail", async function (req, res, next) {
+    console.log("Gettam vlastite ankete po mailu: " + req.params.mail)
+    const ankete = await getAnketeByMail(req.params.mail);
+    res.json(ankete['rows']);
 });
 
 router.post("/", async function (req, res, next) {
@@ -128,14 +169,9 @@ router.post("/", async function (req, res, next) {
         }
 
     }
-
     res.sendStatus(200);
 });
 
-router.get("/forMail/:mail", async function (req, res, next) {
-    const ankete = await getVlastiteAnketeByMail(req.params.mail);
-    res.json(ankete);
-});
 
 // mozda ubuduce budemo imali startdate pa cemo iz toga dobiti i vrijeme u koliko sati da se obavi
 const jobRule = (howOften) => {
@@ -246,7 +282,10 @@ let createAnswers = async function (idPitanja, moguceOpcijeTekst) {
          returning id`
     );
 };
-
+let getAllAnkete = async function () {
+    return db.query(`SELECT *
+                     from ankete`);
+}
 let createSlanjeAnkete = async function (idAnkete, datum, trajanje) {
     return db.query(
         `INSERT INTO slanje_ankete(id_ankete, datum, trajanje)
@@ -261,6 +300,27 @@ let createVlasitaAnketa = async function (idSlanjeAnkete, mail_osobe) {
                      returning id`);
 };
 
+let getAnketeByMail = async function (mail_osobe) {
+    return db.query(`SELECT DISTINCT va.id
+                     from ankete
+                              join slanje_ankete sa on ankete.id = sa.id_ankete
+                              join vlastite_ankete va on sa.id = va.id_slanje_ankete
+                     where mail = '${mail_osobe}'
+    `);
+}
+
+let getVlastitaAnketaByID = async function (id_osobe) {
+    return db.query(`SELECT *
+                     from vlastite_ankete
+                     where id = '${id_osobe}'`);
+}
+
+let getSlanjeAnketeByID = async function (id_osobe) {
+    return db.query(`SELECT *
+                     from slanje_ankete
+                     where id = '${id_osobe}'`);
+}
+
 let getVlastiteAnketeByMail = async function (mail_osobe) {
     return db.query(`SELECT *
                      from vlastite_ankete
@@ -273,7 +333,9 @@ let getAnketaByID = async function (id) {
                         where id = '${id}'`)
     )["rows"][0];
 
-
+    if (anketaIzBaze === undefined) {
+        return undefined;
+    }
     let ime = anketaIzBaze["ime"];
 
     let questions = (
