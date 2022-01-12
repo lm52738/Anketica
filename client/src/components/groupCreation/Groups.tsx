@@ -4,7 +4,7 @@ import { GroupsHeader } from './GroupsHeader';
 import axios from "axios";
 import { FC, useState, useEffect } from "react";
 import { isEmpty } from '@chakra-ui/utils';
-import { Button } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
 
 interface group {
   id: number;
@@ -130,14 +130,14 @@ export default function DataTable() {
       <div style={{ height: '80%', width: '90%', position: 'absolute', left: '5%', right: '5%', background: '#FFFFFF'}}>
         <div style={{ alignItems: 'center', margin: '30px'}}>
             <a href="/addGroup">
-              <Button> Add new group</Button>
+              <Button> Add new group</Button> 
             </a>
         </div>
         
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={10}
+          pageSize={5}
           onCellEditCommit={handleCommit}
         />
       </div>

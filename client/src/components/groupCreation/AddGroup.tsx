@@ -6,24 +6,27 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import { GroupsHeader } from './GroupsHeader';
 import { isEmpty, valuesIn } from "lodash";
-import { PrimaryButton } from "./shared/Buttons";
+import { PrimaryButton } from "../shared/Buttons";
+import { GroupImage } from "./GroupImage";
+import { BsFillPersonFill  } from "react-icons/bs";
 
 interface GroupFormFields {
     ime: string;
-    mails: Array<string>;
   }
 
-interface mail {
+interface User {
+    ime: string
+    prezime: string;
     mail: string;
 }
 
 export const AddGroup = () => {
+    const { push } = useHistory();
 
-    var [mail, setMail] = useState<mail>();
+    var [user, setUser] = useState<User>();
+    let users = Array<User>();
+    const [rows, setRows] = useState<User[]>([]);
     let mails = Array<string>();
-    const [rows, setRows] = useState<string[]>([]);
-    let newMails = Array<string>();
-    const [data, setData] = useState<FormData>();
 
     const {
         register,
@@ -32,7 +35,6 @@ export const AddGroup = () => {
     } = useForm<GroupFormFields>({
         defaultValues: {
         ime: "",
-        mails: [],
         },
     });
 
@@ -41,16 +43,10 @@ export const AddGroup = () => {
         axios.get("http://localhost:9000/addGroup").then((response) => {
         console.log(response.data);
         
-        for (mail of response.data){
-            if (mail)
-                mails.push(mail?.mail);
-        }
-    
-        console.log(mails)
+        setRows(response.data);
 
-        if (!isEmpty(mails))
-            setRows(mails);
         });
+        
     };
 
     // treba dohvatit
@@ -59,18 +55,23 @@ export const AddGroup = () => {
 
     const input: SubmitHandler<GroupFormFields> = async (data) => {
 
-        console.log(data);
+        const allData = {
+            ...data,
+            mails,
+          };
+        console.log(allData);
 
-        //window.location.reload();
-        //await axios.post("http://localhost:9000/addGroup", data);
+        await axios.post("http://localhost:9000/addGroup", allData);
+
+        push("/groups");
     
     };
 
     const handleCheckBox = (event) => {
         console.log(event.target.value);
         
-        newMails.push(event.target.value);
-        console.log(newMails);
+        mails.push(event.target.value);
+        console.log(mails);
 
     }
 
@@ -78,13 +79,12 @@ export const AddGroup = () => {
         <div>
         <GroupsHeader />
         <VStack
-        align="start" minW={{base: "100vw",md: "1000px",}}
-        w="full" maxW={{ base: "100vw",  md: "400px", }}
+        align="start" minW={{base: "100vw",md: "400px",}}
+        w="full" maxW={{ base: "100vw",  md: "1000px", }}
         minH={{base: "100vh", md: "400px", }}
         h="full" maxH={{ base: "100vh", md: "650px", }}
         bg="white" boxShadow={{ base: "none", md: "lg", }}
         borderRadius={{ base: "none", md: "lg", }}
-        marginTop={{ md:"50px" }} 
         mx="auto" p="6" spacing="6"
         onSubmit={handleSubmit(input)} >
         <>
@@ -93,18 +93,32 @@ export const AddGroup = () => {
                 Add new group
                 </Text>
             </Flex>
-            <HStack as="form" spacing="200" align="start" minW="full" >
-                <VStack>
-                <Box>
+            <HStack as="form" spacing="150" align="start" minW="full" >
+                <VStack spacing="6" height={{base: "100vw",  md: "400px",}} 
+                width={{base: "100vw",md: "500px", }} >
+                <Flex width="100%" align="center" justify="center">
                     <FormLabel>Name of group</FormLabel>
                     <Input
+                    width="50%"
                     required
                     {...register("ime")}
                     disabled={isSubmitting}
                     type="text"
-                    />
-                </Box>
-                
+                    />                    
+                </Flex>
+
+                <Flex
+                display={{
+                    base: "none",
+                    lg: "flex",
+                }}
+                align="center"
+                justify="center"
+                direction="column"
+                >
+                    <GroupImage/>
+                </Flex>
+
                 <PrimaryButton
                     type="submit"
                     isLoading={isSubmitting}
@@ -115,11 +129,18 @@ export const AddGroup = () => {
                 </VStack>
                 
                 <VStack spacing="6" style={{ overflowY: "scroll" }} height={{base: "100vw",  md: "400px",}} 
-                width={{base: "100vw",md: "400px", }} 
+                width={{base: "100vw",md: "250px", }} alignItems="left"
                 >
 
-                    {rows.map(mail => (
-                        <div><input onChange={handleCheckBox} type="checkbox" name={mail} value={mail} /> {mail}</div>
+                    {rows.map(user => (
+                        <Flex align="center">
+                            <input onChange={handleCheckBox} type="checkbox" name={user?.mail} value={user?.mail} />
+                            <div  style={{ paddingLeft:"3%", paddingRight:"3%"}}>
+                               <BsFillPersonFill size = {20}/> 
+                            </div>
+                            
+                            <Text> {user?.ime} {user?.prezime}</Text>
+                        </Flex>
                     ))}                
                 
                 </VStack>
