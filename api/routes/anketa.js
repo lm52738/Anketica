@@ -8,28 +8,7 @@ router.use(bodyParser.json({type: "application/*+json"}));
 
 
 const add = require('date-fns/add')
-/*
-U POSTMANU na localhost:9000/anketa, POST metoda, body raw JSON
 
-{
-    "creator": "userId", // ovo nam basically isto ne treba u requestu jer ces preko bearer tokena moc saznat koji je user poslao, tako da ja bi idealno samo token slao u headeru umjesto ovoga
-    "title": "test anketa",
-    "description": "JAKO SUPER ANKETA KOJA JE SUPAC SUPAC SUP",
-    "questions": [{
-            "mode": "radio", // (ili "text" ili "checkbox"), mozemo i s brojevima ako zelis, svejedno
-            "question": "u koliko sati se dizes ujutro ~ tip 0 je jedan tocan odg",
-            "answers": ["8", "9", "10"],   // za text saljem praznu listu valjda, nije ni bitno
-            "isRequired": true   //novo
-        }
-    ],
-    // sve dalje je isto novo
-    "groupName": "Ime grupe",
-    "emails": ["hrvoje@hotmails.com", "example@gmail.com"],
-    "emailTitle": "Header poruke",
-    "emailMessage": "Pocetni tekst poruke" //nakon kojeg dode i link na anketu ili nes
-}
-
-*/
 
 router.get("/", async function (req, res, next) {
     res.sendStatus(200);
@@ -37,9 +16,7 @@ router.get("/", async function (req, res, next) {
 
 router.get("/:id/", async function (req, res, next) {
     console.log(req.params.id);
-
-    const anketa = await getAnketaByID(5);
-
+    const anketa = await getAnketaByID(req.params.id);
     res.json(anketa);
 });
 
@@ -152,13 +129,12 @@ router.post("/", async function (req, res, next) {
 
     }
 
-    let anketeZahh = (await getVlastiteAnketeByMail("h.h@gmail.com"))['rows']
-
-    console.log(anketeZahh)
-
-    await getAnketaByID(0);
-
     res.sendStatus(200);
+});
+
+router.get("/forMail/:mail", async function (req, res, next) {
+    const ankete = await getVlastiteAnketeByMail(req.params.mail);
+    res.json(ankete);
 });
 
 // mozda ubuduce budemo imali startdate pa cemo iz toga dobiti i vrijeme u koliko sati da se obavi
@@ -250,7 +226,9 @@ let questionTypeStringToInt = function (stringVal) {
 
 let createAnketa = async function (imeAnkete) {
     return db.query(
-        `INSERT INTO ankete(ime) values('${imeAnkete}') returning id`
+        `INSERT INTO ankete(ime)
+         values ('${imeAnkete}')
+         returning id`
     );
 };
 let createQuestion = async function (tekstPitanja, idTipaPitanja, idAnkete) {
