@@ -37,7 +37,7 @@ export const App = () => {
           <Route path={["/", "/home"]} exact>
             <Authentification />
           </Route>
-          <Route path={["/", "/surveys"]} exact>
+          <Route path="/surveys" exact>
             <Surveys />
           </Route>
           <Route path="/new-survey" exact>
