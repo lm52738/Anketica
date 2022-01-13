@@ -3,7 +3,7 @@ import { PieChart, Pie, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Toolti
 import { Text,VStack } from "@chakra-ui/react";
 import axios from "axios";
 import { StatisticsHeader } from './StatisticsHeader';
-import { useEffect } from 'react';
+import { useEffect, useState } from "react";
 import { useParams } from 'react-router';
 
 const data1 = [
@@ -73,15 +73,25 @@ const data1 = [
     );
   };
 
+interface Pitanje {
+  ime: string;
+  id: number;
+  tekst: string;
+  id_tip_pitanja: number;
+}
+
 export default function Chart() {
-  const { id } = useParams();
+  const { id }= useParams();
+  const [pitanje, setPitanje] = useState<Pitanje>();
+  const [pitanja, setPitanja] = useState<Pitanje[]>([]);
 
   const getUserData = () => {
+    console.log(id);
     const url = "http://localhost:9000/statistics/" + id;
+    console.log(url);
     axios.get(url).then((response) => {
       console.log(response.data);
-      
-
+      setPitanja(response.data);
     });
 
   };

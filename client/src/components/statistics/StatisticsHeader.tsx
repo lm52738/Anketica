@@ -1,9 +1,11 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsFillPersonFill  } from "react-icons/bs";
 import { Box, Text, Heading, Flex } from "@chakra-ui/react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import * as React from 'react';
+
 
 const theme = extendTheme({
   colors: {
@@ -24,20 +26,22 @@ const theme = extendTheme({
   },
 });
 
-interface Anketa {
-  id: number;
+interface Pitanje {
   ime: string;
+  id: number;
+  tekst: string;
+  id_tip_pitanja: number;
 }
 
   export const StatisticsHeader = () => {
-    const { id } = useParams();
-    var [anketa, setAnketa] = useState<Anketa>();
+    const {id}  = useParams();
+    const [pitanje, setPitanje] = useState<Pitanje[]>([]);
 
   const getUserData = () => {
     const url = "http://localhost:9000/statistics/" + id;
-    axios.get<Anketa>(url).then((response) => {
+    axios.get(url).then((response) => {
       console.log(response.data);
-      setAnketa(response.data);
+      setPitanje(response.data);
     });
 
   };
@@ -49,7 +53,7 @@ interface Anketa {
        <Flex justify="space-evenly" direction="row" alignItems = 'stretch'>
           <Flex width = '50%' alignSelf = 'baseline'> 
            <Text fontSize = {35} >
-           Ime Ankete {anketa?.ime}
+           {pitanje[1]?.ime}
            </Text >
           </Flex>
        </Flex>      
