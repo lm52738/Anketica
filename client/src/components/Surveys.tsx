@@ -57,10 +57,10 @@ const columns: GridColDef[] = [
     headerName: ' ',
     width: 150,
     renderCell: (cellValues) => {
-      const onClick = async (e) => {
+      const onClick = async () => {
         let id = cellValues.id;
         let path = `./statistics/` + id;
-        
+        window.open(path,"_self");
       };
       return <Button onClick={onClick}>View Statistics</Button>;
     }
