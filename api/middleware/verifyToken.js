@@ -18,6 +18,7 @@ module.exports = async (req, res, next) => {
 
       req.user = await Osoba.fetchByOsobaId(user.id);
       console.log("Verifyan token");
+      console.log (req.user);
       next();
     });
   } else {
