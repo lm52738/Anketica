@@ -70,7 +70,7 @@ const columns: GridColDef[] = [
 export default function DataTable() {
   var [group, setGroup] = useState<group>();
   let groups = Array<group>();
-  const [rows, setRows] = useState<group[]>([]);
+  var [rows, setRows] = useState<group[]>([]);
 
   //dohvat grupa
   const getUserData = () => {

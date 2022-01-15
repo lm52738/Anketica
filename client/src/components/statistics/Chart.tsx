@@ -16,45 +16,31 @@ const data1 = [
   const data2 = [
     {
       name: 'Page A',
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
+      pv: 20,
     },
     {
       name: 'Page B',
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
+      pv: 12,
     },
     {
       name: 'Page C',
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
+      pv: 5,
     },
     {
       name: 'Page D',
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
+      pv: 17,
     },
     {
       name: 'Page E',
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
+      pv: 8,
     },
     {
       name: 'Page F',
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
+      pv: 3,
     },
     {
       name: 'Page G',
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
+      pv: 10,
     },
   ];
   
@@ -76,14 +62,26 @@ const data1 = [
 interface Pitanje {
   ime: string;
   id: number;
-  tekst: string;
+  tekst_pitanja: string;
   id_tip_pitanja: number;
+  tekst_odgovora: Array<string>;
+}
+
+interface Odgovor {
+  name: string;
+  value: number;
 }
 
 export default function Chart() {
   const { id }= useParams();
-  const [pitanje, setPitanje] = useState<Pitanje>();
+  var [pitanje, setPitanje] = useState<Pitanje>();
   const [pitanja, setPitanja] = useState<Pitanje[]>([]);
+
+  var tekst = Array<Pitanje>();
+  const [tekstPitanja, setTekstPitanja] = useState<Pitanje[]>([]);
+
+  var odabir = Array<Pitanje>();
+  const [odabirPitanja, setOdabirPitanja] = useState<Pitanje[]>([]);
 
   const getUserData = () => {
     console.log(id);
@@ -92,6 +90,21 @@ export default function Chart() {
     axios.get(url).then((response) => {
       console.log(response.data);
       setPitanja(response.data);
+
+      for (pitanje of pitanja){
+        if (pitanje.id_tip_pitanja === 2){
+          tekst.push(pitanje);
+        } else{
+          odabir.push(pitanje);
+        }
+      }
+      
+      setTekstPitanja(tekst);
+      setOdabirPitanja(odabir);
+
+      console.log(tekstPitanja);
+      console.log(odabirPitanja);
+
     });
 
   };
@@ -99,82 +112,90 @@ export default function Chart() {
   // treba dohvatit
   useEffect(() => getUserData(), []);
 
+
   return (
     <div>
     <StatisticsHeader />
-    <VStack
-    align="center" minW={{base: "100vw",md: "400px",}}
-    w="full" maxW={{ base: "100vw",  md: "1000px", }}
-    minH={{base: "100vh", md: "400px", }}
-    h="full" maxH={{ base: "100vh", md: "650px", }}
-    bg="white" boxShadow={{ base: "none", md: "lg", }}
-    borderRadius={{ base: "none", md: "lg", }}
-    mx="auto" p="6" spacing="6" marginTop="2%">
-      <Text fontSize="20">Pitanje 1</Text>
-      <PieChart width={300} height={300} >
-            <Pie
-            data={data1}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={renderCustomizedLabel}
-            outerRadius={120}
-            fill="#8884d8"
-            dataKey="value"
-            >
-            {data1.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-            </Pie>
-            <Legend />
-      </PieChart>
+    {odabirPitanja.map(pitanje => (
+      <div>
+        <VStack
+        align="center" minW={{base: "100vw",md: "400px",}}
+        w="full" maxW={{ base: "100vw",  md: "1000px", }}
+        minH={{base: "100vh", md: "400px", }}
+        h="full" maxH={{ base: "100vh", md: "650px", }}
+        bg="white" boxShadow={{ base: "none", md: "lg", }}
+        borderRadius={{ base: "none", md: "lg", }}
+        mx="auto" p="6" spacing="6" marginTop="2%">
+          <Text fontSize="20">{pitanje.tekst_pitanja}</Text>
+          <PieChart width={300} height={300} >
+                <Pie
+                data={data1}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={120}
+                fill="#8884d8"
+                dataKey="value"
+                >
+                {data1.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+                </Pie>
+                <Legend />
+          </PieChart>
+          
+      </VStack>
       
-    </VStack>
-    <VStack
-    align="center" minW={{base: "100vw",md: "400px",}}
-    w="full" maxW={{ base: "100vw",  md: "1000px", }}
-    minH={{base: "100vh", md: "400px", }}
-    h="full" maxH={{ base: "100vh", md: "650px", }}
-    bg="white" boxShadow={{ base: "none", md: "lg", }}
-    borderRadius={{ base: "none", md: "lg", }}
-    mx="auto" p="6" spacing="6" marginTop="2%">
-      <Text fontSize="20">Pitanje 2</Text>
-      <BarChart
-          width={700}
-          height={300}
-          data={data2}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="pv" fill="#8884d8" />
-        </BarChart>
-    </VStack>
-    <VStack align="center" minW={{base: "100vw",md: "400px",}}
-    w="full" maxW={{ base: "100vw",  md: "1000px", }}
-    minH={{base: "100vh", md: "400px", }}
-    h="full" maxH={{ base: "100vh", md: "650px", }}
-    bg="white" boxShadow={{ base: "none", md: "lg", }}
-    borderRadius={{ base: "none", md: "lg", }}
-    mx="auto" p="6" spacing="6" marginTop="2%">
-      <Text fontSize="20">Pitanje 3</Text>
-      <Text width="90%" bg="#dbdbdb" boxShadow={{ base: "none", md: "lg", }}
-       borderRadius={{ base: "none", md: "lg", }} p="3">Odgovor</Text>
-      <Text width="90%" bg="#dbdbdb" boxShadow={{ base: "none", md: "lg", }}
-       borderRadius={{ base: "none", md: "lg", }} p="3">Odgovor</Text>
-      <Text width="90%" bg="#dbdbdb" boxShadow={{ base: "none", md: "lg", }}
-       borderRadius={{ base: "none", md: "lg", }} p="3">Odgovor</Text>
-      <Text width="90%" bg="#dbdbdb" boxShadow={{ base: "none", md: "lg", }}
-       borderRadius={{ base: "none", md: "lg", }} p="3">Odgovor</Text>
-    </VStack>
+      <VStack
+        align="center" minW={{base: "100vw",md: "400px",}}
+        w="full" maxW={{ base: "100vw",  md: "1000px", }}
+        minH={{base: "100vh", md: "400px", }}
+        h="full" maxH={{ base: "100vh", md: "650px", }}
+        bg="white" boxShadow={{ base: "none", md: "lg", }}
+        borderRadius={{ base: "none", md: "lg", }}
+        mx="auto" p="6" spacing="6" marginTop="2%">
+          <Text fontSize="20">{pitanje.tekst_pitanja}</Text>
+          <BarChart
+              width={700}
+              height={300}
+              data={data2}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" fill="#8884d8" />
+            </BarChart>
+      </VStack>
+
+      </div>
+    ))} 
+    
+
+    {tekstPitanja.map(pitanje => (
+        <VStack align="center" minW={{base: "100vw",md: "400px",}}
+        w="full" maxW={{ base: "100vw",  md: "1000px", }}
+        minH={{base: "100vh", md: "400px", }}
+        h="full" maxH={{ base: "100vh", md: "650px", }}
+        bg="white" boxShadow={{ base: "none", md: "lg", }}
+        borderRadius={{ base: "none", md: "lg", }}
+        mx="auto" p="6" spacing="6" marginTop="2%">
+          <Text fontSize="20">{pitanje.tekst_pitanja}</Text>
+    
+          {pitanje.tekst_odgovora.map(odgovor => (
+            <Text width="90%" bg="#dbdbdb" boxShadow={{ base: "none", md: "lg", }}
+            borderRadius={{ base: "none", md: "lg", }} p="3">{odgovor}</Text>
+          ))}  
+        </VStack>
+    ))} 
     </div>   
         
   );

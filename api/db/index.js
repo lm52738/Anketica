@@ -1,11 +1,10 @@
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'Anketica',
-  password: 'bazepodataka',
-  port: 5432,
+  user: "projektadmin",
+  host: "161.53.18.24",
+  database: "Ankete",
+  password: process.env.DB_PASSWORD,
 });
 
 module.exports = {
