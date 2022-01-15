@@ -35,23 +35,16 @@ const columns: GridColDef[] = [
     align: 'center',
   },
   {
-    field: 'id_slanje_ankete',
-    headerName: 'Id of sent survey',
-    width: 200,
-    align: 'center',
-  },
-  {
     field: 'broj_pitanja',
     headerName: 'Number of Questions',
     width: 250,
     align: 'center',
   },
   {
-    field: 'filledout_All',
-    headerName: 'Filled out',
-    width: 150,
+    field: 'br_anketa',
+    headerName: 'Number of surveys',
+    width: 200,
     align: 'center',
-    headerAlign: 'center',
   },
   {
     field: 'statistics',
@@ -73,9 +66,8 @@ interface Anketa {
   ime: string;
   ispunjena: boolean;
   deadline: Date;
-  id_slanje_ankete: number;
   broj_pitanja: number;
-  //filledout_All: number;
+  br_anketa: number;
 }
 
 export default function DataTable() {
