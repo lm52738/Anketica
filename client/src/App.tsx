@@ -2,6 +2,7 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Authentification from "pages/Authentification";
 import NewSurvey from "pages/NewSurvey";
 import Surveys from "components/Surveys";
+import Drawer from "components/Drawer";
 import ProfilePage from "pages/ProfilePage";
 import Groups from "components/groupCreation/Groups";
 import React from "react";
@@ -57,6 +58,9 @@ export const App = () => {
           </Route>
           <Route path="/statistics/:id" exact>
             <Chart />
+          </Route>
+          <Route path="/drawer" exact>
+            <Drawer />
           </Route>
         </Switch>
       </ChakraProvider>

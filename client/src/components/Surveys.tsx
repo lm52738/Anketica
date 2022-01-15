@@ -6,6 +6,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Button, Link } from '@chakra-ui/react';
 import { useHistory } from 'react-router-dom';
+import ResponsiveDrawer from "./Drawer";
 
 const columns: GridColDef[] = [
   //{ field: 'nameOfSurvay', headerName: 'nameOfSurvay', width: 90 },
