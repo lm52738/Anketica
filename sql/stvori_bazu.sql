@@ -74,6 +74,7 @@ CREATE TABLE ankete
 (
     id  int         not null DEFAULT nextval('ankete_SEQ'),
     ime varchar(64) not null,
+    opis varchar(256) not null,
 
     CONSTRAINT ankete_pk PRIMARY KEY (id)
 );
