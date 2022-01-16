@@ -61,6 +61,35 @@ router.get("/mail/:mail", async function (req, res, next) {
     res.json(ankete['rows']);
 });
 
+
+// {
+//      OVO JE ID SLANJA ANKETE, JER NAM TREBA STATISTIKA PO SLANJU
+//     "id": 1,
+//      OVO JE LISTA PITANJA, OBJEKTI IMAJU KLJUC ID PITANJA, A VRIJEDNOST ODGOVOR
+//     "questions": [
+//     {"3": "Da"},
+//     {"4" : "Cupavci,Paprenjaci"},
+//     {"5": "Ovo je proizvoljno blabla"}
+//
+// ]
+// }
+router.post("/submit-survey", async function (req, res, next) {
+    console.log(req.body)
+    let {id, questions, mail} = req.body;
+    for (let i = 0; i < questions.length; i++) {
+        let question = questions[i]
+        let questionID = Object.keys(question)[0]
+        let questionAnswer = question[questionID];
+
+        console.log(questionID)
+        console.log(questionAnswer)
+
+        let answerID = (await saveAnswer(id, mail, questionID, questionAnswer))['rows'][0]['id']
+        console.log("Spremljen odgovor, id je " + answerID)
+    }
+    res.sendStatus(200);
+});
+
 router.post("/", async function (req, res, next) {
     console.log(req.body);
 
@@ -130,18 +159,18 @@ router.post("/", async function (req, res, next) {
     console.log(questions)
 
 
-    let idAnkete = (await createAnketa(title))['rows'][0]['id']
+    let idAnkete = (await createAnketa(title, description))['rows'][0]['id']
     console.log("STVOREN ENTRY ANKETA, ID: " + idAnkete)
     for (const questionIter of questions) {
-        console.log("~~~~~~~~~~~~~~~~~~~~~~")
-        let {mode, question, answers} = questionIter;
+        //console.log("~~~~~~~~~~~~~~~~~~~~~~")
+        let {mode, question, answers, isRequired} = questionIter;
 
-        let questionID = (await createQuestion(question, questionTypeStringToInt(mode), idAnkete))['rows'][0]['id']
-        console.log("STVOREN ENTRY PITANJE, ID: " + questionID)
+        let questionID = (await createQuestion(question, questionTypeStringToInt(mode), idAnkete, isRequired))['rows'][0]['id']
+        //console.log("STVOREN ENTRY PITANJE, ID: " + questionID)
 
-        console.log("MOGUCE OPCIJE SU: " + answers)
+        //console.log("MOGUCE OPCIJE SU: " + answers)
         let answersID = (await createAnswers(questionID, answers))['rows'][0]['id']
-        console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + answersID)
+        // console.log("STVOREN ENTRY MOGUCE OPCIJE, ID: " + answersID)
     }
 
 
@@ -151,8 +180,8 @@ router.post("/", async function (req, res, next) {
     recurrances = parseInt(recurrances)
     for (let i = 0; i < recurrances + 1; i++) {
         let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        console.log(i, recurrances)
-        console.log(i < recurrances + 1)
+        // console.log(i, recurrances)
+        // console.log(i < recurrances + 1)
         console.log("Stvorena anketa koja se pita ", date)
 
         let slanjeId = (await createSlanjeAnkete(idAnkete, date, timePeriod))['rows'][0]['id']
@@ -260,17 +289,25 @@ let questionTypeStringToInt = function (stringVal) {
 };
 
 
-let createAnketa = async function (imeAnkete) {
+let saveAnswer = async function (idSlanja, mailOsobe, pitanjeID, pitanjeOdgovor) {
     return db.query(
-        `INSERT INTO ankete(ime)
-         values ('${imeAnkete}')
+        `INSERT INTO odgovori_na_pitanja(mail_osobe, id_slanje_ankete, id_pitanja, tekst)
+         VALUES ('${mailOsobe}', '${idSlanja}', '${pitanjeID}', '${pitanjeOdgovor}')
+         returning id`
+    )
+}
+
+let createAnketa = async function (imeAnkete, descriptionAnkete) {
+    return db.query(
+        `INSERT INTO ankete(ime, opis)
+         values ('${imeAnkete}', '${descriptionAnkete}')
          returning id`
     );
 };
-let createQuestion = async function (tekstPitanja, idTipaPitanja, idAnkete) {
+let createQuestion = async function (tekstPitanja, idTipaPitanja, idAnkete, isRequired) {
     return db.query(
-        `INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete)
-         values ('${tekstPitanja}', '${idTipaPitanja}', '${idAnkete}')
+        `INSERT INTO pitanja(tekst, id_tip_pitanja, id_ankete, required)
+         values ('${tekstPitanja}', '${idTipaPitanja}', '${idAnkete}', '${isRequired}')
          returning id`
     );
 };
@@ -321,11 +358,7 @@ let getSlanjeAnketeByID = async function (id_osobe) {
                      where id = '${id_osobe}'`);
 }
 
-let getVlastiteAnketeByMail = async function (mail_osobe) {
-    return db.query(`SELECT *
-                     from vlastite_ankete
-                     where mail = '${mail_osobe}'`);
-};
+
 let getAnketaByID = async function (id) {
     let anketaIzBaze = await (
         await db.query(`SELECT *
@@ -337,6 +370,7 @@ let getAnketaByID = async function (id) {
         return undefined;
     }
     let ime = anketaIzBaze["ime"];
+    let opis = anketaIzBaze["opis"]
 
     let questions = (
         await db.query(`SELECT *
@@ -361,12 +395,14 @@ let getAnketaByID = async function (id) {
             question: question["tekst"],
             type: question["id_tip_pitanja"],
             possibleAnswers: possibleAnswers["tekst"],
+            required: question['required']
         });
     }
 
     let anketa = {
         id: id,
         name: ime,
+        description: opis,
         questions: questionsArray,
     };
     console.log(anketa);
