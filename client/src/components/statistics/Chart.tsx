@@ -5,44 +5,6 @@ import axios from "axios";
 import { StatisticsHeader } from './StatisticsHeader';
 import { useEffect, useState } from "react";
 import { useParams } from 'react-router';
-
-const data1 = [
-    { name: 'Group A', value: 400 },
-    { name: 'Group B', value: 300 },
-    { name: 'Group C', value: 300 },
-    { name: 'Group D', value: 200 },
-  ];
-
-  const data2 = [
-    {
-      name: 'Page A',
-      pv: 20,
-    },
-    {
-      name: 'Page B',
-      pv: 12,
-    },
-    {
-      name: 'Page C',
-      pv: 5,
-    },
-    {
-      name: 'Page D',
-      pv: 17,
-    },
-    {
-      name: 'Page E',
-      pv: 8,
-    },
-    {
-      name: 'Page F',
-      pv: 3,
-    },
-    {
-      name: 'Page G',
-      pv: 10,
-    },
-  ];
   
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
   
@@ -58,6 +20,13 @@ const data1 = [
       </text>
     );
   };
+  interface OdabirPitanje {
+    ime: string;
+    id: number;
+    tekst_pitanja: string;
+    id_tip_pitanja: number;
+    tekst_odgovora: Array<Odgovor>;
+  }
 
 interface Pitanje {
   ime: string;
@@ -74,14 +43,18 @@ interface Odgovor {
 
 export default function Chart() {
   const { id }= useParams();
+
   var [pitanje, setPitanje] = useState<Pitanje>();
+  var [odgovor, setOdgovor] = useState<Odgovor>();
+
   const [pitanja, setPitanja] = useState<Pitanje[]>([]);
 
   var tekst = Array<Pitanje>();
   const [tekstPitanja, setTekstPitanja] = useState<Pitanje[]>([]);
 
-  var odabir = Array<Pitanje>();
-  const [odabirPitanja, setOdabirPitanja] = useState<Pitanje[]>([]);
+  var [odabirPitanje, setOdabirPitanje] = useState<OdabirPitanje>();
+  var odabir = Array<OdabirPitanje>();
+  const [odabirPitanja, setOdabirPitanja] = useState<OdabirPitanje[]>([]);
 
   const getUserData = () => {
     console.log(id);
@@ -92,10 +65,34 @@ export default function Chart() {
       setPitanja(response.data);
 
       for (pitanje of pitanja){
+        setPitanje(pitanje);
         if (pitanje.id_tip_pitanja === 2){
           tekst.push(pitanje);
         } else{
-          odabir.push(pitanje);
+          var map = new Map<string,number>();
+          for(var odg of pitanje.tekst_odgovora){
+            if (map.has(odg)){
+              var oldV = map.get(odg);
+              if (oldV){
+                var value = oldV + 100;
+                map.set(odg,value);
+              }
+            } else {
+              map.set(odg,100);
+            }
+          }
+          
+          var odgovori = new Array<Odgovor>();
+          for  (var entry of map.entries()){
+            var odgovor = {name: entry[0], value: entry[1]};
+            setOdgovor(odgovor);
+            odgovori.push(odgovor);
+          }
+
+          var pitanjeO = {ime: pitanje.ime,id: pitanje.id,tekst_pitanja: pitanje.tekst_pitanja,
+            id_tip_pitanja: pitanje.id_tip_pitanja,tekst_odgovora: odgovori};
+          setOdabirPitanje(pitanjeO);
+          odabir.push(pitanjeO);
         }
       }
       
@@ -129,7 +126,7 @@ export default function Chart() {
           <Text fontSize="20">{pitanje.tekst_pitanja}</Text>
           <PieChart width={300} height={300} >
                 <Pie
-                data={data1}
+                data={pitanje.tekst_odgovora}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -138,7 +135,7 @@ export default function Chart() {
                 fill="#8884d8"
                 dataKey="value"
                 >
-                {data1.map((entry, index) => (
+                {pitanje.tekst_odgovora.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
                 </Pie>
@@ -159,7 +156,7 @@ export default function Chart() {
           <BarChart
               width={700}
               height={300}
-              data={data2}
+              data={pitanje.tekst_odgovora}
               margin={{
                 top: 5,
                 right: 30,
