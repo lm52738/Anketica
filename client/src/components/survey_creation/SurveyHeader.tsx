@@ -198,7 +198,7 @@ export const SurveyHeader = () => {
               </Select>
             </FormControl>
             <FormControl>
-              <FormLabel>Duration</FormLabel>
+              <FormLabel>Duration of each survey</FormLabel>
               <Select {...register("duration")}>
                 <option value="0">1 week</option>
                 <option value="1">2 weeks</option>

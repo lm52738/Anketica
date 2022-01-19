@@ -44,7 +44,7 @@ export const App = () => {
           <Route path="/new-survey" exact>
             <NewSurvey />
           </Route>
-          <Route path="/survey" exact>
+          <Route path="/survey/:id" exact>
             <SurveyPage />
           </Route>
           <Route path="/profile" exact>
