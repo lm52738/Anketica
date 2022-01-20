@@ -103,7 +103,7 @@ router.post("/", async function (req, res, next) {
         questions,
     } = req.body;
 
-    const now = Date.now();
+    const now = new Date();
 
     const mails = emails.split(",").map((mail) => mail.trim());
 
@@ -197,7 +197,7 @@ router.post("/", async function (req, res, next) {
         }
     }
 
-    if (howOften != null && recurrances > 0) {
+    if (recurrances > 0) {
         // primjeri https://crontab.tech/examples
         const job = schedule.scheduleJob(
             {
