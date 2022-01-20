@@ -46,15 +46,25 @@ interface InputSurvey {
 }
 
 interface VlastitaAnketa {
-  id: string;
+  id: number;
+  id_slanje_ankete: number;
+  ispunjena: boolean;
+  mail: string;
+}
+
+interface SlanjeAnketa {
+  datum: string;
+  id: number;
+  id_ankete: number;
+  trajanje: number;
 }
 
 const SurveyPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const [surveyDetails, setSurvey] = useState<SurveyDetails>({
     id: "",
-    name: "",
-    description: "TODO",
+    name: "This survey doesn't exist!",
+    description: "",
     questions: [],
   });
   const { push } = useHistory();
@@ -78,18 +88,33 @@ const SurveyPage: FC = () => {
 
   useEffect(() => {
     const getSurveyQuestions = async () => {
-      const response2 = await axios.get(
+      const responseVlastita = await axios.get<VlastitaAnketa[]>(
         `http://localhost:9000/anketa/vlastita/${id}`
       );
-      console.log(response2.data);
-      const response = await axios.get<SurveyDetails>(
-        `http://localhost:9000/anketa/id/${id}`
-      );
-      setSurvey(response.data);
-      setInputs({
-        id: response.data.id,
-        questions: new Map<string, string[]>(),
-      });
+
+      if (responseVlastita.data.length === 0) {
+        console.log("error!!");
+      } else {
+        const vlastita = responseVlastita.data[0];
+
+        console.log(vlastita);
+
+        const responseSlanje = await axios.get<SlanjeAnketa[]>(
+          `http://localhost:9000/anketa/slanje/${vlastita.id_slanje_ankete}`
+        );
+
+        const response = await axios.get<SurveyDetails>(
+          `http://localhost:9000/anketa/id/${responseSlanje.data[0].id_ankete}`
+        );
+
+        console.log(response);
+
+        setSurvey(response.data);
+        setInputs({
+          id: vlastita.id_slanje_ankete.toString(),
+          questions: new Map<string, string[]>(),
+        });
+      }
     };
 
     getSurveyQuestions();
