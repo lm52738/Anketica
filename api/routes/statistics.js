@@ -12,7 +12,7 @@ router.get('/:id', async function(req, res, next) {
     from pitanja
     left join ankete on (ankete.id = pitanja.id_ankete)
     left join odgovori_na_pitanja on (odgovori_na_pitanja.id_pitanja = pitanja.id)
-    where ankete.id = %s
+    where ankete.id = '%s'
     group by ankete.ime,pitanja.id,pitanja.tekst, pitanja.id_tip_pitanja`,id));
   console.log(sql.rows);
   res.json(sql.rows);
