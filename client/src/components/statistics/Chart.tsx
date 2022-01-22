@@ -64,7 +64,7 @@ export default function Chart() {
       console.log(response.data);
       setPitanja(response.data);
 
-      for (pitanje of pitanja){
+      for (var pitanje of response.data){
         setPitanje(pitanje);
         if (pitanje.id_tip_pitanja === 2){
           tekst.push(pitanje);
@@ -74,11 +74,11 @@ export default function Chart() {
             if (map.has(odg)){
               var oldV = map.get(odg);
               if (oldV){
-                var value = oldV + 100;
+                var value = oldV + 1;
                 map.set(odg,value);
               }
             } else {
-              map.set(odg,100);
+              map.set(odg,1);
             }
           }
           
@@ -184,7 +184,7 @@ export default function Chart() {
         h="full" maxH={{ base: "100vh", md: "650px", }}
         bg="white" boxShadow={{ base: "none", md: "lg", }}
         borderRadius={{ base: "none", md: "lg", }}
-        mx="auto" p="6" spacing="6" marginTop="2%">
+        mx="auto" p="6" spacing="6" marginTop="2%" overflow="auto">
           <Text fontSize="20">{pitanje.tekst_pitanja}</Text>
     
           {pitanje.tekst_odgovora.map(odgovor => (
@@ -193,6 +193,7 @@ export default function Chart() {
           ))}  
         </VStack>
     ))} 
+    <div style={{ margin:"2%", padding:"10px"}}></div>
     </div>   
         
   );
