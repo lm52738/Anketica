@@ -54,11 +54,17 @@ router.get("/slanje/:id/", async function (req, res, next) {
     res.json(anketa["rows"]);
 });
 
-router.get("/mail/:mail", async function (req, res, next) {
+router.get("sveVlastite/:mail", async function (req, res, next) {
+    console.log("Gettam vlastite ankete po mailu: " + req.params.mail);
+    const ankete = await getVlastiteAnketeByMail(req.params.mail);
+    res.json(ankete["rows"]);
+});
+router.get("sve/:mail", async function (req, res, next) {
     console.log("Gettam vlastite ankete po mailu: " + req.params.mail);
     const ankete = await getAnketeByMail(req.params.mail);
     res.json(ankete["rows"]);
 });
+
 
 // {
 //      OVO JE ID SLANJA ANKETE, JER NAM TREBA STATISTIKA PO SLANJU
@@ -335,6 +341,16 @@ let createVlasitaAnketa = async function (idSlanjeAnkete, mail_osobe) {
 };
 
 let getAnketeByMail = async function (mail_osobe) {
+    return db.query(`SELECT DISTINCT ankete.id
+                     from ankete
+                              join slanje_ankete sa on ankete.id = sa.id_ankete
+                              join vlastite_ankete va on sa.id = va.id_slanje_ankete
+                                
+                     where mail = '${mail_osobe}'
+    `);
+};
+
+let getVlastiteAnketeByMail = async function (mail_osobe) {
     return db.query(`SELECT DISTINCT va.id
                      from ankete
                               join slanje_ankete sa on ankete.id = sa.id_ankete
