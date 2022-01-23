@@ -54,12 +54,12 @@ router.get("/slanje/:id/", async function (req, res, next) {
     res.json(anketa["rows"]);
 });
 
-router.get("sveVlastite/:mail", async function (req, res, next) {
+router.get("/sveVlastite/:mail", async function (req, res, next) {
     console.log("Gettam vlastite ankete po mailu: " + req.params.mail);
     const ankete = await getVlastiteAnketeByMail(req.params.mail);
     res.json(ankete["rows"]);
 });
-router.get("sve/:mail", async function (req, res, next) {
+router.get("/sve/:mail", async function (req, res, next) {
     console.log("Gettam vlastite ankete po mailu: " + req.params.mail);
     const ankete = await getAnketeByMail(req.params.mail);
     res.json(ankete["rows"]);
