@@ -16,16 +16,14 @@ router.get("/", verifyToken, async function(req, res, next) {
       group by slanje_ankete.id_ankete,ankete.ime, vlastite_ankete.ispunjena, deadline,vlastite_ankete.id_slanje_ankete;
    `;
    const resultCategories = (await db.query(sqlSurveys)).rows;
-   console.log(resultCategories);
+   //console.log(resultCategories);
    console.log (req.user);
    //console.log (re);
    res.json(resultCategories);
 });
-router.get("/bla", async function(req, res, next) {
+router.get("/bla",verifyToken, async function(req, res, next) {
    //res.send("SURVEYS");
-   const sqlSurveys = `select slanje_ankete.id as id, ime, ispunjena from slanje_ankete inner join ankete on (ankete.id = slanje_ankete.id_ankete) 
-   inner join vlastite_ankete on (vlastite_ankete.id_slanje_ankete = ankete.id) 
-   inner join pitanja on (ankete.id = pitanja.id_ankete);`;
+   const sqlSurveys = `select * from osobe where id = ` + req.user.id + `;`;
    const resultCategories = (await db.query(sqlSurveys)).rows;
    console.log(resultCategories);
    res.json(resultCategories);

@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { Button, Link } from '@chakra-ui/react';
 import { useHistory } from 'react-router-dom';
 import ResponsiveDrawer from "./Drawer";
+import PersistentDrawerLeft from "./Drawer2";
+
 
 const columns: GridColDef[] = [
   //{ field: 'nameOfSurvay', headerName: 'nameOfSurvay', width: 90 },
@@ -75,7 +77,7 @@ interface Anketa {
   deadline: Date;
   id_slanje_ankete: number;
   broj_pitanja: number;
-  //filledout_All: number;
+  filledout_All: number;
 }
 
 export default function DataTable() {
@@ -94,7 +96,8 @@ export default function DataTable() {
 
   return (
      <div>
-     <SurveysHeader />
+       <SurveysHeader />
+     
     <div style={{ height: '80%', width: '90%', position: 'absolute', left: '5%', right: '5%', background: '#FFFFFF'}}>
       <DataGrid
         rows={redovi}

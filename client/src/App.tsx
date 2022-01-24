@@ -3,6 +3,7 @@ import Authentification from "pages/Authentification";
 import NewSurvey from "pages/NewSurvey";
 import Surveys from "components/Surveys";
 import Drawer from "components/Drawer";
+import Drawer2 from "components/Drawer2";
 import ProfilePage from "pages/ProfilePage";
 import Groups from "components/groupCreation/Groups";
 import React from "react";
@@ -60,7 +61,10 @@ export const App = () => {
             <Chart />
           </Route>
           <Route path="/drawer" exact>
-            <Drawer />
+            <Drawer2 />
+          </Route>
+          <Route path="/dr" exact>
+            <Drawer2 />
           </Route>
         </Switch>
       </ChakraProvider>

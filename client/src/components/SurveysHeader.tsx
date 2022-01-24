@@ -5,6 +5,7 @@ import { FaBeer } from "@react-icons/all-files/fa/FaBeer";
 import { BsFillPersonFill  } from "react-icons/bs";
 import { Box, Text, Heading, Flex } from "@chakra-ui/react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import PersistentDrawerLeft from "./Drawer2";
 
 const theme = extendTheme({
   colors: {
@@ -28,6 +29,7 @@ const theme = extendTheme({
 export const SurveysHeader = () => {
   return (
      <Flex justify="space-evenly" direction="row" alignItems = 'stretch'>
+       <PersistentDrawerLeft/>
         <Flex width = '50%' alignSelf = 'baseline'> 
          <Text fontSize = {35} >
          Anketica
