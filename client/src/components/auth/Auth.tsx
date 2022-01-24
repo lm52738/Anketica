@@ -1,4 +1,5 @@
 import { VStack } from "@chakra-ui/react";
+import { useRedirect } from "components/shared/Utils";
 import React, { useState } from "react";
 import { LoginForm, SignUpForm } from "./Forms";
 
@@ -8,6 +9,8 @@ export const Auth = () => {
   const switchFormMode = () => {
     setShowLogin(!showLogin);
   };
+
+  useRedirect();
 
   return (
     <VStack

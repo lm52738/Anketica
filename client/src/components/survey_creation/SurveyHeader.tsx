@@ -24,6 +24,7 @@ import { useSurvey } from "context/Survey";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdSend } from "react-icons/md";
+import { useHistory } from "react-router-dom";
 import ReactSelect from "react-select";
 import { PrimaryButton } from "../shared/Buttons";
 
@@ -80,6 +81,7 @@ export const SurveyHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isGroupOpen, onToggle } = useDisclosure();
   const { questions, removeEmptyQuestions } = useSurvey();
+  const { push } = useHistory();
 
   let [mails, setMails] = useState<string[]>([]);
   let groups = Array<group>();
@@ -171,6 +173,8 @@ export const SurveyHeader = () => {
     console.log(allData);
 
     await axios.post("http://localhost:9000/anketa", allData);
+
+    push("surveys");
   });
 
   const handleCheckBox = (event) => {

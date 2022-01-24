@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { PrimaryButton } from "components/shared/Buttons";
-import { getUser } from "components/shared/Utils";
+import { getUser, useRedirect } from "components/shared/Utils";
 import { SurveyProvider } from "context/Survey";
 import React, { FC, useEffect, useState } from "react";
 import { MdSend } from "react-icons/md";
@@ -63,11 +63,13 @@ const SurveyPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const [surveyDetails, setSurvey] = useState<SurveyDetails>({
     id: "",
-    name: "This survey doesn't exist!",
+    name: "",
     description: "",
     questions: [],
   });
   const { push } = useHistory();
+
+  const [errorMsg, setError] = useState<string | null>();
 
   const [inputSurvey, setInputs] = useState<InputSurvey>({
     id: "",
@@ -88,37 +90,46 @@ const SurveyPage: FC = () => {
 
   useEffect(() => {
     const getSurveyQuestions = async () => {
+      localStorage.setItem("survey", `/survey/${id}`);
+
       const responseVlastita = await axios.get<VlastitaAnketa[]>(
         `http://localhost:9000/anketa/vlastita/${id}`
       );
 
       if (responseVlastita.data.length === 0) {
-        console.log("error!!");
+        setError("This survey doesn't exist");
       } else {
         const vlastita = responseVlastita.data[0];
 
         console.log(vlastita);
+        const userMail = getUser().osoba.mail;
 
-        const responseSlanje = await axios.get<SlanjeAnketa[]>(
-          `http://localhost:9000/anketa/slanje/${vlastita.id_slanje_ankete}`
-        );
+        if (userMail === vlastita.mail) {
+          const responseSlanje = await axios.get<SlanjeAnketa[]>(
+            `http://localhost:9000/anketa/slanje/${vlastita.id_slanje_ankete}`
+          );
 
-        const response = await axios.get<SurveyDetails>(
-          `http://localhost:9000/anketa/id/${responseSlanje.data[0].id_ankete}`
-        );
+          const response = await axios.get<SurveyDetails>(
+            `http://localhost:9000/anketa/id/${responseSlanje.data[0].id_ankete}`
+          );
 
-        console.log(response);
+          console.log(response);
 
-        setSurvey(response.data);
-        setInputs({
-          id: vlastita.id_slanje_ankete.toString(),
-          questions: new Map<string, string[]>(),
-        });
+          setSurvey(response.data);
+          setInputs({
+            id: vlastita.id_slanje_ankete.toString(),
+            questions: new Map<string, string[]>(),
+          });
+        } else {
+          setError("You dont have access to this survey!");
+        }
       }
     };
 
     getSurveyQuestions();
   }, []);
+
+  useRedirect();
 
   return (
     <SurveyProvider>
@@ -132,7 +143,9 @@ const SurveyPage: FC = () => {
           align="center"
         >
           <Flex bg="white" direction="column">
-            <Text {...unfocusedFormTitleStyles}>{surveyDetails.name}</Text>
+            <Text {...unfocusedFormTitleStyles}>
+              {errorMsg ?? surveyDetails.name}
+            </Text>
             <Box h="1" />
             <Text {...unfocusedFormDescriptionStyles}>
               {surveyDetails.description}
