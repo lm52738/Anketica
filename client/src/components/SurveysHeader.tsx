@@ -28,7 +28,7 @@ const theme = extendTheme({
 
 export const SurveysHeader = () => {
   return (
-     <Flex justify="space-evenly" direction="row" alignItems = 'stretch'>
+     <Flex justify="space-evenly" direction="row" alignItems = 'stretch' width="100%">
        <Flex>
          <PersistentDrawerLeft />
        </Flex>

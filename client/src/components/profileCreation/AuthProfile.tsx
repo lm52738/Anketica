@@ -42,6 +42,7 @@ export const AuthProfile = () => {
       mx="auto"
       p="6"
       spacing="6"
+      marginRight="5%"
     >
       {viewProfile ? (
         <ProfileView switchFormMode={switchFormMode} />
