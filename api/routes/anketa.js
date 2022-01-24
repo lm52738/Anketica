@@ -54,6 +54,7 @@ router.get("/slanje/:id/", async function (req, res, next) {
   res.json(anketa["rows"]);
 });
 
+//ovo nek se prestane koristit asap
 router.get("/sveVlastite/:mail", async function (req, res, next) {
   console.log("Gettam vlastite ankete po mailu: " + req.params.mail);
   const ankete = await getVlastiteAnketeByMail(req.params.mail);
@@ -340,11 +341,9 @@ let createVlasitaAnketa = async function (idSlanjeAnkete, mail_osobe) {
 };
 
 let getAnketeByMail = async function (mail_osobe) {
-  return db.query(`SELECT DISTINCT ankete.id
-                     from ankete
+  return db.query(`SELECT * from ankete
                               join slanje_ankete sa on ankete.id = sa.id_ankete
                               join vlastite_ankete va on sa.id = va.id_slanje_ankete
-                                
                      where mail = '${mail_osobe}'
     `);
 };
