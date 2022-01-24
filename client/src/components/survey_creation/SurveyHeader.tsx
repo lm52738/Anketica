@@ -21,9 +21,10 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useSurvey } from "context/Survey";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdSend } from "react-icons/md";
+import ReactSelect from "react-select";
 import { PrimaryButton } from "../shared/Buttons";
 
 const unfocusedFormTitleStyles = {
@@ -66,12 +67,58 @@ interface InputFields {
   emails: string;
   emailTitle: string;
   emailMessage: string;
+  existingGroupName: string;
+}
+
+interface group {
+  id: number;
+  ime: string;
+  mail: string;
 }
 
 export const SurveyHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isGroupOpen, onToggle } = useDisclosure();
   const { questions, removeEmptyQuestions } = useSurvey();
+
+  let [mails, setMails] = useState<string[]>([]);
+  let groups = Array<group>();
+  var [rows, setRows] = useState<group[]>([]);
+  let [selectedMails, setSelectedMails] = useState([]);
+
+  //dohvat grupa
+  const getUserData = () => {
+    axios.get<group[]>("http://localhost:9000/groups").then((response) => {
+      setMails(
+        response.data
+          .map((grupa) => grupa.mail)
+          // unique
+          .filter((value, index, self) => self.indexOf(value) === index)
+      );
+
+      for (let grupa of response.data) {
+        if (grupa) {
+          let id = grupa.id;
+          let oldGroup = groups.find((g) => g.id === id);
+
+          if (oldGroup) {
+            let mail = oldGroup.mail.concat(", " + grupa.mail);
+            grupa.mail = mail;
+
+            groups.pop();
+          }
+          groups.push(grupa);
+        }
+      }
+
+      if (groups.length > 0) {
+        setRows(groups);
+      }
+    });
+  };
+
+  // treba dohvatit
+  useEffect(() => getUserData(), []);
 
   const {
     register,
@@ -84,16 +131,40 @@ export const SurveyHeader = () => {
       howOften: "",
       duration: "",
       recurrances: 0,
+      existingGroupName: "",
       groupName: "",
-      emails: "",
       emailTitle: "Invitation to survey",
       emailMessage: "Take my survey!",
     },
   });
 
   const sendSurvey = handleSubmit(async (data) => {
+    const groupName = isGroupOpen ? data.existingGroupName : data.groupName;
+    if (!isGroupOpen) {
+      const ime = groupName;
+      const mails = selectedMails.map((event) => event.value);
+
+      console.log({ ime, mails });
+      await axios.post("http://localhost:9000/addGroup", { ime, mails });
+    }
+
+    const description = data.description;
+    const duration = data.duration;
+    const emailMessage = data.emailMessage;
+    const emailTitle = data.emailTitle;
+    const howOften = data.howOften;
+    const recurrances = data.recurrances;
+    const title = data.title;
+
     const allData = {
-      ...data,
+      description,
+      duration,
+      emailMessage,
+      emailTitle,
+      howOften,
+      recurrances,
+      title,
+      groupName,
       questions,
     };
 
@@ -101,6 +172,11 @@ export const SurveyHeader = () => {
 
     await axios.post("http://localhost:9000/anketa", allData);
   });
+
+  const handleCheckBox = (event) => {
+    setSelectedMails(event);
+    console.log(selectedMails);
+  };
 
   return (
     <>
@@ -154,12 +230,12 @@ export const SurveyHeader = () => {
           <ModalBody>
             <Grid columnGap="10" rowGap="5" templateColumns="repeat(2, 1fr)">
               {isGroupOpen ? (
-                // TODO dovrisit kada imamo fetchanje grupa
                 <FormControl>
                   <FormLabel>Select existing group</FormLabel>
-                  <Select>
-                    <option>Grupa 1</option>
-                    <option>Grupa 2</option>
+                  <Select {...register("existingGroupName")}>
+                    {rows.map((grupa) => (
+                      <option>{grupa.ime}</option>
+                    ))}
                   </Select>
                 </FormControl>
               ) : (
@@ -170,7 +246,18 @@ export const SurveyHeader = () => {
                   </FormControl>
                   <FormControl>
                     <FormLabel>Emails</FormLabel>
-                    <Input {...register("emails")} />
+                    <ReactSelect
+                      defaultValue={selectedMails}
+                      isMulti
+                      name="Emails"
+                      options={mails.map((mail) => ({
+                        value: mail,
+                        label: mail,
+                      }))}
+                      className="basic-multi-select"
+                      classNamePrefix="select"
+                      onChange={handleCheckBox}
+                    />
                   </FormControl>
                 </>
               )}
