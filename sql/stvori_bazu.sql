@@ -72,8 +72,9 @@ CREATE TABLE tip_pitanja
 CREATE SEQUENCE ankete_SEQ INCREMENT BY 1 MINVALUE 0;
 CREATE TABLE ankete
 (
-    id  int         not null DEFAULT nextval('ankete_SEQ'),
-    ime varchar(64) not null,
+    id   int          not null DEFAULT nextval('ankete_SEQ'),
+    ime  varchar(64)  not null,
+    opis varchar(256) not null,
 
     CONSTRAINT ankete_pk PRIMARY KEY (id)
 );
@@ -117,7 +118,7 @@ CREATE SEQUENCE odgovori_na_pitanja_SEQ INCREMENT BY 1 MINVALUE 0;
 CREATE TABLE odgovori_na_pitanja
 (
     id               int  not null DEFAULT nextval('odgovori_na_pitanja_SEQ'),
-    id_osobe         int references osobe (id),
+    mail_osobe       varchar(64)   DEFAULT NULL,
     id_slanje_ankete int references slanje_ankete (id),
     id_pitanja       int references pitanja (id),
     tekst            text not null,

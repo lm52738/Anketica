@@ -16,7 +16,7 @@ export const useRedirect = () => {
   const location = useLocation();
 
   if (isAuthenticated() && location.pathname === "/") {
-    push("/landing-page");
+    push("/surveys");
   } else if (!isAuthenticated() && location.pathname !== "/") {
     push("/");
   }

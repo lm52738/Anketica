@@ -45,12 +45,17 @@ export const LoginForm: FC<Props> = ({ switchFormMode }) => {
 
     try {
       const response = await axios.post("http://localhost:9000/login", data);
-      
+
       if (response.data.token) {
         localStorage.setItem("user", JSON.stringify(response.data));
       }
-      
-      push("/surveys");
+
+      const link = localStorage.getItem("survey");
+      if (link) {
+        push(link);
+      } else {
+        push("/surveys");
+      }
     } catch (err) {
       console.log(err);
       setAuthError("Invalid credentials!");
@@ -137,7 +142,6 @@ export const SignUpForm: FC<Props> = ({ switchFormMode }) => {
     if (response.data.token) {
       localStorage.setItem("user", JSON.stringify(response.data));
     }
-    
 
     // validation
     push("surveys");
