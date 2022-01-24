@@ -2,6 +2,8 @@ import { extendTheme } from "@chakra-ui/react";
 import React from "react";
 import { BsFillPersonFill  } from "react-icons/bs";
 import { Text, Flex } from "@chakra-ui/react";
+import PersistentDrawerLeft from "components/Drawer2";
+
 
 const theme = extendTheme({
   colors: {
@@ -25,6 +27,7 @@ const theme = extendTheme({
 export const GroupsHeader = () => {
   return (
      <Flex justify="space-evenly" direction="row" alignItems = 'stretch'>
+       <Flex><PersistentDrawerLeft/></Flex>
         <Flex width = '50%' alignSelf = 'baseline'> 
          <Text fontSize = {35} >
          Anketica

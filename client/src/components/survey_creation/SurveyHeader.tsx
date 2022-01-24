@@ -27,6 +27,7 @@ import { MdSend } from "react-icons/md";
 import { useHistory } from "react-router-dom";
 import ReactSelect from "react-select";
 import { PrimaryButton } from "../shared/Buttons";
+import PersistentDrawerLeft from "../Drawer2";
 
 const unfocusedFormTitleStyles = {
   color: "black",
@@ -192,6 +193,7 @@ export const SurveyHeader = () => {
         borderBottomColor="primary-60"
         align="center"
       >
+        <Flex><PersistentDrawerLeft /></Flex>
         <Flex bg="white" direction="column">
           <Input
             {...register("title")}

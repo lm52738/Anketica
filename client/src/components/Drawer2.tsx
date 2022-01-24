@@ -29,10 +29,13 @@ import TextField from '@material-ui/core/TextField';
 import ProfilePage from "pages/ProfilePage";
 import SurveysPage from "./Surveys";
 import Button from '@material-ui/core/Button';
+import GroupIcon from '@material-ui/icons/Group';
+import GroupAddIcon from '@material-ui/icons/GroupAdd';
 
 
-
-
+const logOut = () => {
+  window.localStorage.clear(); 
+}
 
 
 const drawerWidth = 240;
@@ -110,10 +113,21 @@ interface User {
 const adminPart = (type : boolean) => {
    if (type){
    return (
+     <>
       <ListItem button key={'New Survey'}>
             <ListItemIcon><HelpOutlineIcon/></ListItemIcon>
-            <ListItemText primary={'New Survey'} />
+            <Link href ="/new-survey"><ListItemText primary={'New Survey'} /></Link>
       </ListItem>
+      <ListItem button key={'Groups'}>
+            <ListItemIcon><GroupIcon/></ListItemIcon>
+            <Link href="/groups"><ListItemText primary={'Groups'} /></Link>
+      </ListItem>
+      <ListItem button key={'Add Group'}>
+            <ListItemIcon><GroupAddIcon/></ListItemIcon>
+            <Link href ="/addGroup"><ListItemText primary={'Add Group'} /> </Link>
+      </ListItem>
+      </>
+      
    )
    }else return (<></>)
 }
@@ -196,23 +210,23 @@ export default function PersistentDrawerLeft() {
         <List>
         <ListItem button key={'Home'}>
             <ListItemIcon><HomeIcon/></ListItemIcon>
-            <ListItemText primary={'Home'} />
+            <Link href="/home"><ListItemText primary={'Home'} /> </Link>
          </ListItem>
          <ListItem button key={'Profile'}>
             <ListItemIcon><PersonIcon/></ListItemIcon>
-            <ListItemText primary={'Profile'} />
+            <Link href="/profile"><ListItemText primary={'Profile'} /></Link>
          </ListItem>
          <ListItem button key={'All Surveys'}>
             <ListItemIcon><QueryBuilderIcon/></ListItemIcon>
-            <ListItemText primary={'All Surveys'} />
+            <Link href="/surveys"><ListItemText primary={'All Surveys'} /></Link>
          </ListItem>
-         <ListItem button key={'Statistic'}>
+         {/* <ListItem button key={'Statistic'}>
             <ListItemIcon><BarChartIcon/></ListItemIcon>
-            <ListItemText primary={'Statistic'} />
-         </ListItem>
+            <Link href="/statistic"><ListItemText primary={'Statistic'} /></Link>
+         </ListItem> */}
          <ListItem button key={'Log Out'}>
             <ListItemIcon><ExitToAppIcon/></ListItemIcon>
-            <ListItemText primary={'Log Out'} />
+            <Link href="/home" onClick={logOut}><ListItemText primary={'Log Out'} /></Link>
          </ListItem>
          {/* <ListItem button key={'Log Outi'}>
             <ListItemIcon><ExitToAppIcon/></ListItemIcon>

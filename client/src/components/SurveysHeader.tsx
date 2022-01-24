@@ -29,7 +29,9 @@ const theme = extendTheme({
 export const SurveysHeader = () => {
   return (
      <Flex justify="space-evenly" direction="row" alignItems = 'stretch'>
-       <PersistentDrawerLeft/>
+       <Flex>
+         <PersistentDrawerLeft />
+       </Flex>
         <Flex width = '50%' alignSelf = 'baseline'> 
          <Text fontSize = {35} >
          Anketica
