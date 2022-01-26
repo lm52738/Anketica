@@ -92,6 +92,7 @@ router.post("/submit-survey", async function (req, res, next) {
     ][0]["id"];
     console.log("Spremljen odgovor, id je " + answerID);
   }
+  await updateIspunjenaAnketa(id, mail);
   res.sendStatus(200);
 });
 
@@ -281,6 +282,10 @@ let getMailsByGroupName = async function (groupName) {
                               join osobe o on osoba_grupa.id_osoba = o.id
                      where g.ime = '${groupName}'`);
 };
+
+let updateIspunjenaAnketa = async function(id_slanja_ankete, mailOsobe){
+  db.query(`UPDATE vlastite_ankete  SET ispunjena = '${true}' where id_slanje_ankete = '${id_slanja_ankete}' and mail = '${mailOsobe}'`)
+}
 
 let saveAnswer = async function (
   idSlanja,
