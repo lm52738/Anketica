@@ -78,6 +78,12 @@ interface group {
   mail: string;
 }
 
+interface User {
+  ime: string;
+  prezime: string;
+  mail: string;
+}
+
 export const SurveyHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isGroupOpen, onToggle } = useDisclosure();
@@ -89,39 +95,38 @@ export const SurveyHeader = () => {
   var [rows, setRows] = useState<group[]>([]);
   let [selectedMails, setSelectedMails] = useState([]);
 
-  //dohvat grupa
-  const getUserData = () => {
-    axios.get<group[]>("http://localhost:9000/groups").then((response) => {
-      setMails(
-        response.data
-          .map((grupa) => grupa.mail)
-          // unique
-          .filter((value, index, self) => self.indexOf(value) === index)
-      );
+  useEffect(() => {
+    //dohvat grupa
+    const getGrupe = async () => {
+      axios.get<User[]>("http://localhost:9000/users").then((response) => {
+        // console.log(response.data);
+        setMails(response.data.map((usr) => usr.mail));
+      });
 
-      for (let grupa of response.data) {
-        if (grupa) {
-          let id = grupa.id;
-          let oldGroup = groups.find((g) => g.id === id);
+      axios.get<group[]>("http://localhost:9000/groups").then((response) => {
+        for (let grupa of response.data) {
+          if (grupa) {
+            let id = grupa.id;
+            let oldGroup = groups.find((g) => g.id === id);
 
-          if (oldGroup) {
-            let mail = oldGroup.mail.concat(", " + grupa.mail);
-            grupa.mail = mail;
+            if (oldGroup) {
+              let mail = oldGroup.mail.concat(", " + grupa.mail);
+              grupa.mail = mail;
 
-            groups.pop();
+              groups.pop();
+            }
+            groups.push(grupa);
           }
-          groups.push(grupa);
         }
-      }
 
-      if (groups.length > 0) {
-        setRows(groups);
-      }
-    });
-  };
+        if (groups.length > 0) {
+          setRows(groups);
+        }
+      });
+    };
 
-  // treba dohvatit
-  useEffect(() => getUserData(), []);
+    getGrupe();
+  }, []);
 
   const {
     register,
@@ -193,7 +198,9 @@ export const SurveyHeader = () => {
         borderBottomColor="primary-60"
         align="center"
       >
-        <Flex><PersistentDrawerLeft /></Flex>
+        <Flex>
+          <PersistentDrawerLeft />
+        </Flex>
         <Flex bg="white" direction="column">
           <Input
             {...register("title")}
