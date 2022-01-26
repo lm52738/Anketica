@@ -35,14 +35,14 @@ interface SurveyQuestion {
 }
 
 interface SurveyDetails {
-  id: string;
+  id: number;
   name: string;
   description: string;
   questions: SurveyQuestion[];
 }
 
 interface InputSurvey {
-  id: string;
+  id: number;
   questions: Map<string, string[]>;
 }
 
@@ -61,9 +61,11 @@ interface SlanjeAnketa {
 }
 
 const SurveyPage: FC = () => {
+  useRedirect();
+
   const { id } = useParams<{ id: string }>();
   const [surveyDetails, setSurvey] = useState<SurveyDetails>({
-    id: "",
+    id: -1,
     name: "",
     description: "",
     questions: [],
@@ -73,21 +75,19 @@ const SurveyPage: FC = () => {
   const [errorMsg, setError] = useState<string | null>();
 
   const [inputSurvey, setInputs] = useState<InputSurvey>({
-    id: "",
+    id: -1,
     questions: new Map<string, string[]>(),
   });
 
   const sendSurvey = async () => {
-    console.log({
-      ...inputSurvey,
-      email: getUser().osoba.mail,
-    });
-
-    await axios.post(`http://localhost:9000/anketa/submit-survey`, {
+    const body = {
       id: inputSurvey.id,
       questions: Object.fromEntries(inputSurvey.questions.entries()),
       email: getUser().osoba.mail,
-    });
+    };
+    console.log(body);
+
+    await axios.post(`http://localhost:9000/anketa/submit-survey`, body);
     push("/surveys");
   };
 
@@ -107,47 +107,49 @@ const SurveyPage: FC = () => {
         console.log(vlastita);
         const userMail = getUser().osoba.mail;
 
-        if (userMail === vlastita.mail) {
-          const responseSlanje = (
-            await axios.get<SlanjeAnketa[]>(
-              `http://localhost:9000/anketa/slanje/${vlastita.id_slanje_ankete}`
-            )
-          ).data[0];
-
-          const datum = new Date(responseSlanje.datum);
-
-          const today = new Date();
-
-          const startDate = new Date(datum);
-          const deadline = addDays(new Date(datum), responseSlanje.trajanje);
-
-          const active = today >= startDate && today <= deadline;
-
-          if (!active) {
-            setError("This survey is inactive!");
-          } else {
-            const response = await axios.get<SurveyDetails>(
-              `http://localhost:9000/anketa/id/${responseSlanje.id_ankete}`
-            );
-
-            console.log(response);
-
-            setSurvey(response.data);
-            setInputs({
-              id: vlastita.id_slanje_ankete.toString(),
-              questions: new Map<string, string[]>(),
-            });
-          }
+        if (vlastita.ispunjena) {
+          setError("You already filled out this survey!");
         } else {
-          setError("You dont have access to this survey!");
+          if (userMail === vlastita.mail) {
+            const responseSlanje = (
+              await axios.get<SlanjeAnketa[]>(
+                `http://localhost:9000/anketa/slanje/${vlastita.id_slanje_ankete}`
+              )
+            ).data[0];
+
+            const datum = new Date(responseSlanje.datum);
+
+            const today = new Date();
+
+            const startDate = new Date(datum);
+            const deadline = addDays(new Date(datum), responseSlanje.trajanje);
+
+            const active = today >= startDate && today <= deadline;
+
+            if (!active) {
+              setError("This survey is inactive!");
+            } else {
+              const response = await axios.get<SurveyDetails>(
+                `http://localhost:9000/anketa/id/${responseSlanje.id_ankete}`
+              );
+
+              console.log(response.data);
+
+              setSurvey(response.data);
+              setInputs({
+                id: vlastita.id_slanje_ankete,
+                questions: new Map<string, string[]>(),
+              });
+            }
+          } else {
+            setError("You dont have access to this survey!");
+          }
         }
       }
     };
 
     getSurveyQuestions();
   }, []);
-
-  useRedirect();
 
   return (
     <SurveyProvider>
@@ -203,7 +205,7 @@ const SurveyPage: FC = () => {
                       onChange={(e) => {
                         const questions = inputSurvey.questions;
                         questions.set(question.questionId, [e]);
-                        setInputs({ id: id, questions: questions });
+                        setInputs({ id: inputSurvey.id, questions: questions });
                       }}
                     >
                       <Flex direction="column">
@@ -224,7 +226,10 @@ const SurveyPage: FC = () => {
                         onChange={(e) => {
                           const questions = inputSurvey.questions;
                           questions.set(question.questionId, [e.target.value]);
-                          setInputs({ id: id, questions: questions });
+                          setInputs({
+                            id: inputSurvey.id,
+                            questions: questions,
+                          });
                         }}
                       />
                     )) ||
@@ -233,7 +238,10 @@ const SurveyPage: FC = () => {
                         onChange={(e: string[]) => {
                           const questions = inputSurvey.questions;
                           questions.set(question.questionId, e);
-                          setInputs({ id: id, questions: questions });
+                          setInputs({
+                            id: inputSurvey.id,
+                            questions: questions,
+                          });
                         }}
                       >
                         <Flex direction="column">

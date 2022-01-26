@@ -5,10 +5,12 @@ export const isAuthenticated: () => boolean = () => {
 };
 
 export const getUser = () => {
-  const user = localStorage.getItem("user");
-  if (user) {
-    return JSON.parse(user);
-  }
+  try {
+    const user = localStorage.getItem("user");
+    if (user) {
+      return JSON.parse(user);
+    }
+  } catch (err) {}
 };
 
 export const useRedirect = () => {
