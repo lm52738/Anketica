@@ -182,6 +182,13 @@ const columns: GridColDef[] = [
     headerAlign: "center",
   },
   {
+    field: "active",
+    headerName: "Active",
+    minWidth: 150,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
     field: "statistics",
     headerName: "Statistics",
     width: 150,
@@ -189,12 +196,5 @@ const columns: GridColDef[] = [
       const onClick = async () => {};
       return <Button onClick={onClick}>View Statistics</Button>;
     },
-  },
-  {
-    field: "active",
-    headerName: "Active",
-    minWidth: 150,
-    align: "center",
-    headerAlign: "center",
   },
 ];
