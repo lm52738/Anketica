@@ -42,6 +42,7 @@ interface Pitanje {
     axios.get(url).then((response) => {
       console.log(response.data);
       setPitanje(response.data);
+      console.log(pitanje[0]?.ime);
     });
 
   };
@@ -53,7 +54,7 @@ interface Pitanje {
        <Flex justify="space-evenly" direction="row" alignItems = 'stretch'>
           <Flex width = '50%' alignSelf = 'baseline'> 
            <Text fontSize = {35} >
-           {pitanje[1]?.ime}
+           {pitanje[0]?.ime}
            </Text >
           </Flex>
        </Flex>      
