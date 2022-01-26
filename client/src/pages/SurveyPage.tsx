@@ -10,6 +10,7 @@ import axios from "axios";
 import { PrimaryButton } from "components/shared/Buttons";
 import { getUser, useRedirect } from "components/shared/Utils";
 import { SurveyProvider } from "context/Survey";
+import addDays from "date-fns/addDays";
 import React, { FC, useEffect, useState } from "react";
 import { MdSend } from "react-icons/md";
 import { useHistory, useParams } from "react-router-dom";
@@ -81,8 +82,10 @@ const SurveyPage: FC = () => {
       ...inputSurvey,
       email: getUser().osoba.mail,
     });
+
     await axios.post(`http://localhost:9000/anketa/submit-survey`, {
-      ...inputSurvey,
+      id: inputSurvey.id,
+      questions: Object.fromEntries(inputSurvey.questions.entries()),
       email: getUser().osoba.mail,
     });
     push("/surveys");
@@ -105,21 +108,36 @@ const SurveyPage: FC = () => {
         const userMail = getUser().osoba.mail;
 
         if (userMail === vlastita.mail) {
-          const responseSlanje = await axios.get<SlanjeAnketa[]>(
-            `http://localhost:9000/anketa/slanje/${vlastita.id_slanje_ankete}`
-          );
+          const responseSlanje = (
+            await axios.get<SlanjeAnketa[]>(
+              `http://localhost:9000/anketa/slanje/${vlastita.id_slanje_ankete}`
+            )
+          ).data[0];
 
-          const response = await axios.get<SurveyDetails>(
-            `http://localhost:9000/anketa/id/${responseSlanje.data[0].id_ankete}`
-          );
+          const datum = new Date(responseSlanje.datum);
 
-          console.log(response);
+          const today = new Date();
 
-          setSurvey(response.data);
-          setInputs({
-            id: vlastita.id_slanje_ankete.toString(),
-            questions: new Map<string, string[]>(),
-          });
+          const startDate = new Date(datum);
+          const deadline = addDays(new Date(datum), responseSlanje.trajanje);
+
+          const active = today >= startDate && today <= deadline;
+
+          if (!active) {
+            setError("This survey is inactive!");
+          } else {
+            const response = await axios.get<SurveyDetails>(
+              `http://localhost:9000/anketa/id/${responseSlanje.id_ankete}`
+            );
+
+            console.log(response);
+
+            setSurvey(response.data);
+            setInputs({
+              id: vlastita.id_slanje_ankete.toString(),
+              questions: new Map<string, string[]>(),
+            });
+          }
         } else {
           setError("You dont have access to this survey!");
         }

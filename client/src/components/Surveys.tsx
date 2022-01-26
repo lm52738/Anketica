@@ -7,48 +7,7 @@ import { useHistory } from "react-router-dom";
 import { getUser, useRedirect } from "./shared/Utils";
 import { SurveysHeader } from "./SurveysHeader";
 import { addDays } from "date-fns";
-
-const columns: GridColDef[] = [
-  {
-    field: "ime",
-    headerName: "Name",
-    width: 200,
-    align: "center",
-  },
-  {
-    field: "opis",
-    headerName: "Description",
-    width: 200,
-    align: "center",
-  },
-  {
-    field: "ispunjena",
-    headerName: "Filled Out",
-    width: 150,
-    align: "center",
-  },
-  {
-    field: "datum",
-    headerName: "Start date",
-    width: 250,
-    align: "center",
-  },
-  {
-    field: "deadline",
-    headerName: "Deadline",
-    width: 250,
-    align: "center",
-  },
-  {
-    field: "statistics",
-    headerName: "Statistics",
-    width: 150,
-    renderCell: (cellValues) => {
-      const onClick = async () => {};
-      return <Button onClick={onClick}>View Statistics</Button>;
-    },
-  },
-];
+import { makeStyles } from "@material-ui/core";
 
 interface AnketaDTO {
   // id je id_vlastita
@@ -73,11 +32,14 @@ interface Anketa {
   opis: string;
   datum: string;
   deadline: string;
+  active: boolean;
 }
 
 export default function DataTable() {
   const [redovi, setRedovi] = useState<Anketa[]>([]);
   const { push } = useHistory();
+
+  useRedirect();
 
   const getUserData = () => {
     const user = getUser();
@@ -88,6 +50,10 @@ export default function DataTable() {
         const ankete: Anketa[] = response.data.map((dto) => {
           const datum = new Date(dto.datum);
           const deadline = addDays(new Date(dto.datum), dto.trajanje);
+
+          const today = new Date();
+
+          const active = today >= datum && today <= deadline;
 
           var dateOptions = {
             weekday: "long",
@@ -106,18 +72,19 @@ export default function DataTable() {
             mail: dto.mail,
             opis: dto.opis,
             deadline: deadline.toLocaleDateString("en-US", dateOptions),
+            active: active,
           };
         });
         setRedovi(ankete);
       });
   };
 
-  useRedirect();
-
   useEffect(() => getUserData(), []);
 
+  const classes = useStyles();
+
   return (
-    <div>
+    <div className={classes.root}>
       <SurveysHeader />
 
       <div
@@ -133,8 +100,25 @@ export default function DataTable() {
         <DataGrid
           rows={redovi}
           columns={columns}
-          pageSize={5}
+          pageSize={10}
           disableSelectionOnClick
+          sortModel={[
+            {
+              field: "active",
+              sort: "desc",
+            },
+            {
+              field: "ispunjena",
+              sort: "desc",
+            },
+            {
+              field: "deadline",
+              sort: "desc",
+            },
+          ]}
+          getRowClassName={(params) => {
+            return params.row.active ? `styledrows` : `inactiverows`;
+          }}
           onCellClick={(params) => {
             const idVlastita = params.id;
             const idAnkete = params.row.id_ankete;
@@ -149,3 +133,68 @@ export default function DataTable() {
     </div>
   );
 }
+
+const useStyles = makeStyles({
+  root: {
+    "& .styledrows": {
+      backgroundColor: "#DBFFE4",
+    },
+    "& .inactiverows": {
+      backgroundColor: "#E5E5E5",
+    },
+  },
+});
+
+const columns: GridColDef[] = [
+  {
+    field: "ime",
+    headerName: "Name",
+    minWidth: 200,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
+    field: "opis",
+    headerName: "Description",
+    minWidth: 200,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
+    field: "ispunjena",
+    headerName: "Filled Out",
+    minWidth: 150,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
+    field: "datum",
+    headerName: "Start date",
+    minWidth: 250,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
+    field: "deadline",
+    headerName: "Deadline",
+    minWidth: 250,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
+    field: "statistics",
+    headerName: "Statistics",
+    width: 150,
+    renderCell: (cellValues) => {
+      const onClick = async () => {};
+      return <Button onClick={onClick}>View Statistics</Button>;
+    },
+  },
+  {
+    field: "active",
+    headerName: "Active",
+    minWidth: 150,
+    align: "center",
+    headerAlign: "center",
+  },
+];
