@@ -36,47 +36,49 @@ interface Anketa {
 }
 
 export default function DataTable() {
+  useRedirect();
+
   const [redovi, setRedovi] = useState<Anketa[]>([]);
   const { push } = useHistory();
-
-  useRedirect();
 
   const getUserData = () => {
     const user = getUser();
 
-    axios
-      .get<AnketaDTO[]>(`http://localhost:9000/anketa/sve/${user.osoba.mail}`)
-      .then((response) => {
-        const ankete: Anketa[] = response.data.map((dto) => {
-          const datum = new Date(dto.datum);
-          const deadline = addDays(new Date(dto.datum), dto.trajanje);
+    if (user) {
+      axios
+        .get<AnketaDTO[]>(`http://localhost:9000/anketa/sve/${user.osoba.mail}`)
+        .then((response) => {
+          const ankete: Anketa[] = response.data.map((dto) => {
+            const datum = new Date(dto.datum);
+            const deadline = addDays(new Date(dto.datum), dto.trajanje);
 
-          const today = new Date();
+            const today = new Date();
 
-          const active = today >= datum && today <= deadline;
+            const active = today >= datum && today <= deadline;
 
-          var dateOptions = {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          };
+            var dateOptions = {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            };
 
-          return {
-            id: dto.id,
-            id_ankete: dto.id_ankete,
-            id_slanje_ankete: dto.id_slanje_ankete,
-            datum: datum.toLocaleDateString("en-US", dateOptions),
-            ime: dto.ime,
-            ispunjena: dto.ispunjena,
-            mail: dto.mail,
-            opis: dto.opis,
-            deadline: deadline.toLocaleDateString("en-US", dateOptions),
-            active: active,
-          };
+            return {
+              id: dto.id,
+              id_ankete: dto.id_ankete,
+              id_slanje_ankete: dto.id_slanje_ankete,
+              datum: datum.toLocaleDateString("en-US", dateOptions),
+              ime: dto.ime,
+              ispunjena: dto.ispunjena,
+              mail: dto.mail,
+              opis: dto.opis,
+              deadline: deadline.toLocaleDateString("en-US", dateOptions),
+              active: active,
+            };
+          });
+          setRedovi(ankete);
         });
-        setRedovi(ankete);
-      });
+    }
   };
 
   useEffect(() => getUserData(), []);
