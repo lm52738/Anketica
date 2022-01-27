@@ -145,7 +145,7 @@ export default function PersistentDrawerLeft() {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const [userType, setUserType] = React.useState(false);
+  const [userType, setUserType] = React.useState(true);
   const [homePage, setHomePage] = React.useState(false);
   //const [user, setUser] = React.useState<User>();
   var [userId, setUserId] = React.useState<UserId>();
@@ -264,14 +264,6 @@ export default function PersistentDrawerLeft() {
             </ListItemIcon>
             <Link href="/surveys">
               <ListItemText primary={"All Surveys"} />
-            </Link>
-          </ListItem>
-          <ListItem button key={"Create Survey"}>
-            <ListItemIcon>
-              <QueryBuilderIcon />
-            </ListItemIcon>
-            <Link href="/new-survey">
-              <ListItemText primary={"Create Survey"} />
             </Link>
           </ListItem>
           {/* <ListItem button key={'Statistic'}>
