@@ -83,7 +83,7 @@ const SurveyPage: FC = () => {
     const body = {
       id: inputSurvey.id,
       questions: Object.fromEntries(inputSurvey.questions.entries()),
-      email: getUser().osoba.mail,
+      mail: getUser().osoba.mail,
     };
     console.log(body);
 

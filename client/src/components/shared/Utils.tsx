@@ -17,7 +17,10 @@ export const useRedirect = () => {
   const { push } = useHistory();
   const location = useLocation();
 
-  if (isAuthenticated() && location.pathname === "/") {
+  if (
+    isAuthenticated() &&
+    (location.pathname === "/" || location.pathname === "/home")
+  ) {
     push("/surveys");
   } else if (!isAuthenticated() && location.pathname !== "/") {
     push("/");
