@@ -323,8 +323,8 @@ let getMailsByGroupName = async function (groupName) {
 
 let updateIspunjenaAnketa = async function (id_slanja_ankete, mailOsobe) {
     db.query(`UPDATE vlastite_ankete
-              SET ispunjena = '${true}'
-              where id_slanje_ankete = '${id_slanja_ankete}'
+              SET ispunjena = true
+              where id_slanje_ankete = ${id_slanja_ankete}
                 and mail = '${mailOsobe}'`)
 }
 
