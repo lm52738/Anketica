@@ -66,7 +66,7 @@ export default function Chart() {
 
       for (var pitanje of response.data){
         setPitanje(pitanje);
-        if (pitanje.id_tip_pitanja === 2){
+        if (pitanje.id_tip_pitanja === 1){
           tekst.push(pitanje);
         } else{
           var map = new Map<string,number>();

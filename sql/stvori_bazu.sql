@@ -138,8 +138,8 @@ CREATE TABLE moguce_opcije
 insert into tip_pitanja
 values (0, 'MCQ');
 insert into tip_pitanja
-values (1, 'CHECKBOX');
+values (2, 'CHECKBOX');
 insert into tip_pitanja
-values (2, 'FREE_RESPONSE');
+values (1, 'FREE_RESPONSE');
 
 
