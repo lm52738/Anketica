@@ -266,6 +266,14 @@ export default function PersistentDrawerLeft() {
               <ListItemText primary={"All Surveys"} />
             </Link>
           </ListItem>
+          <ListItem button key={"Create Survey"}>
+            <ListItemIcon>
+              <QueryBuilderIcon />
+            </ListItemIcon>
+            <Link href="/new-survey">
+              <ListItemText primary={"Create Survey"} />
+            </Link>
+          </ListItem>
           {/* <ListItem button key={'Statistic'}>
             <ListItemIcon><BarChartIcon/></ListItemIcon>
             <Link href="/statistic"><ListItemText primary={'Statistic'} /></Link>
