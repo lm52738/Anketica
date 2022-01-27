@@ -58,27 +58,27 @@ export const ProfileView: FC<Props> = ({ switchFormMode }) => {
       <VStack as="form" spacing="6" align="start" minW="full">
         <Box minW="full">
           <Text>First name:</Text>
-          <Text>{user?.ime}</Text>
+          {/*<Text>{user?.ime}</Text>*/}
           <Text>{thisUser.osoba.ime}</Text>
         </Box>
         <Box minW="full">
           <Text>Last name:</Text>
-          <Text> {user?.prezime}</Text>
+          {/*<Text> {user?.prezime}</Text>*/}
           <Text>{thisUser.osoba.prezime}</Text>
         </Box>
         <Box minW="full">
           <Text>Email:</Text>
-          <Text>{user?.mail}</Text>
+          {/*<Text>{user?.mail}</Text>*/}
           <Text>{thisUser.osoba.mail}</Text>
         </Box>
         <Box minW="full">
           <Text>Date of Birth:</Text>
-          <Text>{user?.datum_rod.toString().substring(0, 10)}</Text>
+          {/*<Text>{user?.datum_rod.toString().substring(0, 10)}</Text>*/}
           <Text>{thisUser.osoba.datum_rod.toString().substring(0, 10)}</Text>
         </Box>
         <Box minW="full">
           <Text>Gender:</Text>
-          <Text>{user?.rod}</Text>
+          {/*<Text>{user?.rod}</Text>*/}
           <Text>{thisUser.osoba.rod}</Text>
         </Box>
       </VStack>
