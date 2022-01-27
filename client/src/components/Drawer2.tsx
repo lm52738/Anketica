@@ -30,6 +30,7 @@ import ProfilePage from "pages/ProfilePage";
 import SurveysPage from "./Surveys";
 import Button from '@material-ui/core/Button';
 import GroupIcon from '@material-ui/icons/Group';
+import { getUser, useRedirect } from "./shared/Utils";
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
 
 
@@ -110,6 +111,14 @@ interface User {
    password: string;
  }
 
+interface UserId {
+  ime: string;
+  prezime: string;
+  mail: string;
+  id: number;
+  id_uloga : number;
+}
+
 const adminPart = (type : boolean) => {
    if (type){
    return (
@@ -139,18 +148,35 @@ export default function PersistentDrawerLeft() {
   const [open, setOpen] = React.useState(false);
   const [userType, setUserType] = React.useState(false);
   const [homePage, setHomePage] = React.useState(false);
-  var [user, setUser] = React.useState<User>();
-  const bla = true;
+  //const [user, setUser] = React.useState<User>();
+  var [userId, setUserId] = React.useState<UserId>();
+  var bla = false;
+  const user = getUser();
 
-  const getUserData = () => {
-   axios.get<User>("http://localhost:9000/profile").then((response) => {
+  /*const getUserData = () => {
+   axios.get<User>("http://localhost:9000/users").then((response) => {
      console.log(response.data);
      setUser(response.data);
      user?.id_uloga == 1 ? setUserType(false) : setUserType (true)
    });
- };
-   
+ };*/
+ const getUserDataRole = () => {
+  axios.get("http://localhost:9000/users/role").then((response) => {
+    const allUsers = response.data;
+    //console.log (allUsers)
+    for (var i = 0; i < allUsers.length ; i++) {
+      if (allUsers[i].id == user.osoba.id) {
+        if (allUsers[i].id_uloga == 1){
+          setUserType (true)
+        }
+      }
+    }
+    setUserId (response.data)
+    return response.data;
+  });
+};
 
+  const users = getUserDataRole ();
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -234,7 +260,7 @@ export default function PersistentDrawerLeft() {
          </ListItem> */}
         </List>
         <Divider />
-          {bla == true ? adminPart (true) : adminPart (false)} 
+          {userType == true ? adminPart (true) : adminPart (false)} 
       </Drawer>
       <main >
       </main>

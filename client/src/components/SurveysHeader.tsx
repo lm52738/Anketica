@@ -6,6 +6,23 @@ import { BsFillPersonFill  } from "react-icons/bs";
 import { Box, Text, Heading, Flex } from "@chakra-ui/react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import PersistentDrawerLeft from "./Drawer2";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { getUser, useRedirect } from "./shared/Utils";
+
+
+
+interface User {
+  id: number;
+  id_uloga : number;
+  ime: string;
+  prezime: string;
+  mail: string;
+  datum_rod: Date;
+  rod: string;
+  password: string;
+}
+
 
 const theme = extendTheme({
   colors: {
@@ -27,6 +44,14 @@ const theme = extendTheme({
 });
 
 export const SurveysHeader = () => {
+
+  var [user, setUser] = React.useState<User>();
+  var [name, setName] = React.useState<String>();
+  var [surname, setSurname] = React.useState<String>();
+  
+  const currentUser = getUser();
+
+
   return (
      <Flex justify="space-evenly" direction="row" alignItems = 'stretch' width="100%">
        <Flex>
@@ -39,7 +64,7 @@ export const SurveysHeader = () => {
         </Flex>
         <Flex alignItems  ='flex-end'>
          <Text fontSize = {30} >
-         Ime i Prezime
+           {currentUser.osoba.ime} {currentUser.osoba.prezime} 
          </Text >
          <a href='/profile'>
             <BsFillPersonFill size = {50}/>  

@@ -17,6 +17,8 @@ import { useHistory } from "react-router";
 import { PrimaryButton, SecondaryButton } from "../shared/Buttons";
 import axios from "axios";
 import { BsFillPersonFill } from "react-icons/bs";
+import { getUser, useRedirect } from "../shared/Utils";
+
 
 interface Props {
   switchFormMode: VoidFunction;
@@ -34,6 +36,7 @@ interface User {
 
 export const ProfileView: FC<Props> = ({ switchFormMode }) => {
   var [user, setUser] = useState<User>();
+  const thisUser = getUser();
 
   const getUserData = () => {
     axios.get<User>("http://localhost:9000/profile").then((response) => {
@@ -56,22 +59,27 @@ export const ProfileView: FC<Props> = ({ switchFormMode }) => {
         <Box minW="full">
           <Text>First name:</Text>
           <Text>{user?.ime}</Text>
+          <Text>{thisUser.osoba.ime}</Text>
         </Box>
         <Box minW="full">
           <Text>Last name:</Text>
           <Text> {user?.prezime}</Text>
+          <Text>{thisUser.osoba.prezime}</Text>
         </Box>
         <Box minW="full">
           <Text>Email:</Text>
           <Text>{user?.mail}</Text>
+          <Text>{thisUser.osoba.mail}</Text>
         </Box>
         <Box minW="full">
           <Text>Date of Birth:</Text>
           <Text>{user?.datum_rod.toString().substring(0, 10)}</Text>
+          <Text>{thisUser.osoba.datum_rod.toString().substring(0, 10)}</Text>
         </Box>
         <Box minW="full">
           <Text>Gender:</Text>
           <Text>{user?.rod}</Text>
+          <Text>{thisUser.osoba.rod}</Text>
         </Box>
       </VStack>
       <Box minW="full">

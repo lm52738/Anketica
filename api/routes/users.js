@@ -9,10 +9,22 @@ router.get('/', async function (req, res, next) {
     res.json(rez.rows);
 });
 
+router.get('/role', async function (req, res, next) {
+    let rez = await getAllUsersWithRole();
+    res.json(rez.rows);
+});
+
 
 let getAllUsers = async function () {
     return db.query(
         `SELECT ime, prezime, mail
+         from osobe`
+    );
+};
+
+let getAllUsersWithRole = async function () {
+    return db.query(
+        `SELECT ime, prezime, mail, id, id_uloga
          from osobe`
     );
 };
