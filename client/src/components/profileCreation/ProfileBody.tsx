@@ -10,15 +10,13 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import React, { FC, useState, useEffect } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { MdClose } from "react-icons/md";
-import { useHistory } from "react-router";
-import { PrimaryButton, SecondaryButton } from "../shared/Buttons";
 import axios from "axios";
+import React, { FC, useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { BsFillPersonFill } from "react-icons/bs";
-import { getUser, useRedirect } from "../shared/Utils";
-
+import { MdClose } from "react-icons/md";
+import { PrimaryButton, SecondaryButton } from "../shared/Buttons";
+import { getUser } from "../shared/Utils";
 
 interface Props {
   switchFormMode: VoidFunction;
@@ -100,18 +98,8 @@ interface ProfileForm {
 }
 
 export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
-  var [user, setUser] = useState<User>();
+  var [user, setUser] = useState<User>(getUser().osoba);
 
-  const getUserData = () => {
-    axios.get<User>("http://localhost:9000/profile").then((response) => {
-      console.log(response.data);
-      setUser(response.data);
-    });
-  };
-
-  useEffect(() => getUserData(), []);
-
-  const { push } = useHistory();
   const {
     register,
     handleSubmit,
@@ -122,40 +110,41 @@ export const ProfileForm: FC<Props> = ({ switchFormMode }) => {
       lastName: user?.prezime,
       email: user?.mail,
       birthDay: user?.datum_rod,
-      password: user?.password,
-      verifyPassword: user?.password,
+      password: "",
+      verifyPassword: "",
     },
   });
 
-  const [gender, setGender] = useState<GenderType>(() => {
+  const getGender = () => {
     if (user?.rod === "f") {
-      console.log("u ifu");
       return "female";
     } else if (user?.rod === "m") {
       return "male";
     } else {
       return "other";
     }
-  });
+  };
+
+  const [gender, setGender] = useState<GenderType>(getGender());
 
   const id = user?.id;
 
   const signUp: SubmitHandler<ProfileForm> = async (data) => {
-    console.log(data);
     const allData = {
       ...data,
       gender,
       id,
     };
 
-    const response = await axios.post("http://localhost:9000/profile", allData);
+    console.log(allData);
+    // const response = await axios.post("http://localhost:9000/profile", allData);
 
-    if (response.data.token) {
-      localStorage.setItem("user", JSON.stringify(response.data));
-    }
+    // if (response.data.token) {
+    //   localStorage.setItem("user", JSON.stringify(response.data));
+    // }
 
-    // validation
-    push("surveys");
+    // // validation
+    // push("surveys");
   };
 
   return (
